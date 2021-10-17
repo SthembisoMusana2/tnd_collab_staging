@@ -74,6 +74,20 @@ class User{
                 </div>`
         );
     }
+
+    getGroupMemberHtml(){
+        this.profileImage =`../TND-Logo_-Unpacked-Parts.png`;
+        return (
+            `<div class="group-member-object">
+            <div class="group-member-img-obj">
+                <img src=${this.profileImage} class="responsive-img circle group-member-img" alt="member-profile">
+            </div>
+            <div class="member-name">
+                <span class="member-name-text">${this.username}</span>
+            </div>
+        </div>`
+        )
+    }
 }
 
 let messageTest = []
@@ -93,6 +107,14 @@ for(let i=0; i<10;i++){
 console.log(Users[0].toHtml());
 
 let screenYOffset = 1;
+let groupMembersList = document.getElementById('group-members');
+
+
+function updateGroupMembers(UsersList){
+    for(let i = 0; i<UsersList.length; i++){
+        groupMembersList.innerHTML += UsersList[i].getGroupMemberHtml();
+    }
+}
 
 window.addEventListener('load', function(e){
     let contactList = document.getElementById('contact-list');
@@ -101,7 +123,19 @@ window.addEventListener('load', function(e){
     let messageDisplayWind = document.getElementById("message-display");
     let sendButton = document.getElementById('send');
     let messageField = document.getElementById('message-field');
+    let groupMembers = document.getElementById('group-members');
 
+    updateGroupMembers(Users);
+
+    messageDisplayWind.style.height = this.innerHeight-this.innerHeight*0.2 + 'px';
+    screenWindow[0].style.maxHeight = this.window.innerHeight+'px';
+    screenWindow[0].style.overflowY = 'hidden';
+
+    colHeight[0].style.height = (window.innerHeight-screenYOffset)+"px";
+
+    for(let i =0; i<Users.length; i++){
+        contactList.innerHTML += Users[i].toHtml();
+    }
 
     sendButton.addEventListener('click', function(e){
         let messageBody = messageField.value;
@@ -123,18 +157,6 @@ window.addEventListener('load', function(e){
             }
         }
     });
-
-    messageDisplayWind.style.height = this.innerHeight-this.innerHeight*0.2 + 'px';
-    screenWindow[0].style.maxHeight = this.window.innerHeight+'px';
-    screenWindow[0].style.overflowY = 'hidden';
-
-    colHeight[0].style.height = (window.innerHeight-screenYOffset)+"px";
-
-    for(let i =0; i<Users.length; i++){
-        contactList.innerHTML += Users[i].toHtml();
-    }
-    
-
 });
 
 window.addEventListener('resize', function(){

@@ -8,12 +8,12 @@
     <link rel="stylesheet" href="./messaging_struct.css" />
     <link rel="stylesheet" href="./mess-navigation.css" />
     <link rel="stylesheet" href="./messageDisplay.css" />
+    <link rel="stylesheet" href="./profileView.css"  />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <title>Messaging</title>
 </head>
 <body>
-    <div class="body row">
-        
+    <div class="body row" id="body">
         <div class="navigation col s6 no-padding">
             <div class="profile">
                 <div class ="profile-image circle">
@@ -75,9 +75,36 @@
         </div>
 
         <div class="chat-info col s6 no-padding">
-            <div class="profile-image-disp">
-
+            <div class="profile-view-img-section">
+                <div class="profile-view-img circle">
+                    <img src="../TND-Logo_-Unpacked-Parts.png" class="responsive-img circle" alt="Profile View Image" />
+                </div>
+                <!-- <hr > -->
             </div>
+
+            <div class="profile-view-group-info">
+                <h5 class="info-title">Group Info</h5>
+                <hr />
+
+                <p class="group-name">Group Name:</p>
+                <p class="group-description">Group Description:</p>
+                <p class="group-members">Group Members:</p><br />
+                <hr />
+                <h5 class="info-title">Members List</h5>
+                <hr />
+                <div class="group-members" id="group-members">
+                    <div class="group-member-object">
+                        <div class="group-member-img-obj">
+                            <img src="../file-icon.png" class="responsive-img circle group-member-img" alt="member-profile">
+                        </div>
+                        <div class="member-name">
+                            <span class="member-name-text">Sthembiso Musana</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
 
         </div>
     </div>
