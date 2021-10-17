@@ -3,7 +3,7 @@ let card2 = document.getElementById('card-2');
 let card3 = document.getElementById('card-3');
 
 card1.addEventListener('click', function(){
-    window.location.pathname = "./main/messaging.html";
+    window.location.pathname = "./main/Messaging/messaging.html";
 });
 
 card2.addEventListener('click', function(){
