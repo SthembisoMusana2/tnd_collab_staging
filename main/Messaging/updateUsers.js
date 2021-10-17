@@ -1,8 +1,11 @@
 
 class Message{
-    constructor(message, timestamp){
+    constructor(message, timestamp, image = null, sender = null, sent=0){
         this.messagebody = message;
         this.timestamp = timestamp;
+        this.messageImage = image;
+        this.messageSender = sender;
+        this.sent = sent;
     }
 
     getTimstamp(){
@@ -10,6 +13,36 @@ class Message{
     }
     getMessagebody(){
         return this.messagebody;
+    }
+
+    toHtml(){
+        this.messageImage ="../messaging-icon.png";
+        
+        return this.sent === 0?(
+            `<div class = "message-object-sent" id="message-object">
+            <div class ="message-profile-image circle">
+                <img src=${this.messageImage} class="responsive-img circle profile-picture" alt="Profile">
+            </div>
+            <div class="message-bubble" style="background-color: rgb(120, 126, 124);">
+                <p class="message-sender">${this.messageSender}</p>
+                <p class="message-body">${this.messagebody}
+                    <br /><span class="message-time">${this.timestamp}</span>
+                </p>  
+            </div>
+        </div>`
+        ): (
+            `<div class = "message-object" id="message-object">
+            <div class ="message-profile-image circle">
+                <img src=${this.messageImage} class="responsive-img circle profile-picture" alt="Profile">
+            </div>
+            <div class="message-bubble">
+                <p class="message-sender">${this.messageSender}</p>
+                <p class="message-body">${this.messagebody}
+                    <br /><span class="message-time">${this.timestamp}</span>
+                </p>  
+            </div>
+        </div>`
+        );
     }
 }
 
@@ -52,7 +85,7 @@ for(let i=0; i<10;i++){
 
 let Users = [];
 
-for(let i=0; i<9;i++){
+for(let i=0; i<10;i++){
     let tempUser = new User("Sthembiso "+i, messageTest, null);
     Users.push(tempUser);
 }
@@ -60,13 +93,38 @@ for(let i=0; i<9;i++){
 console.log(Users[0].toHtml());
 
 let screenYOffset = 1;
+
 window.addEventListener('load', function(e){
-    let users = document.getElementsByClassName('user');
     let contactList = document.getElementById('contact-list');
     let colHeight = document.getElementsByClassName('body');
     let screenWindow = document.getElementsByTagName('body');
+    let messageDisplayWind = document.getElementById("message-display");
+    let sendButton = document.getElementById('send');
+    let messageField = document.getElementById('message-field');
 
-    
+
+    sendButton.addEventListener('click', function(e){
+        let messageBody = messageField.value;
+        if(messageBody.length > 0){
+            let messageObject  = new Message(messageBody, "01:00", null, "Me");
+            messageDisplayWind.innerHTML += messageObject.toHtml();
+            messageField.value = '';
+        }
+        
+    });
+
+    messageField.addEventListener('keydown', function(e){
+        if(e.key == 'Enter'){
+            let messageBody = messageField.value;
+            if(messageBody.length > 0){
+                let messageObject  = new Message(messageBody, "01:00", null, "Me");
+                messageDisplayWind.innerHTML += messageObject.toHtml();
+                messageField.value = '';
+            }
+        }
+    });
+
+    messageDisplayWind.style.height = this.innerHeight-this.innerHeight*0.2 + 'px';
     screenWindow[0].style.maxHeight = this.window.innerHeight+'px';
     screenWindow[0].style.overflowY = 'hidden';
 
@@ -81,5 +139,7 @@ window.addEventListener('load', function(e){
 
 window.addEventListener('resize', function(){
     let colHeight = document.getElementsByClassName('body');
+    let messageDisplayWind = document.getElementById("message-display");
     colHeight[0].style.height = (window.innerHeight-screenYOffset)+"px";
-})
+    messageDisplayWind.style.height = this.innerHeight-this.innerHeight*0.25 + 'px';
+});

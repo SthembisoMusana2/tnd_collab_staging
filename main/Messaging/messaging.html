@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link rel="stylesheet" href="./messaging_struct.css" />
     <link rel="stylesheet" href="./mess-navigation.css" />
-    <link rel="stylesheet" href="./messageDisplay.css"
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
+    <link rel="stylesheet" href="./messageDisplay.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <title>Messaging</title>
 </head>
 <body>
@@ -30,28 +30,54 @@
         </div>
 
         <div class="chats col s12 no-padding">
+            <!-- Top  -->
             <div class="user-profile">
                 <div class ="profile-image circle">
                     <img src="../messaging-icon.png" class="responsive-img circle profile-picture" alt="Profile">
                 </div>
 
                 <div class="title">
-                    <h5 class="title-text">Messaging</h4>
+                    <h5 class="profile-title-text">Profile of the Group</h4>
                 </div>
-                <div class="more" id="more-menu"></div>
+                <div class="more" id="more-display-menu"></div>
+            </div>
+            <!-- Middle -->
+            <div class="message-display" id = "message-display">
+                <div class = "message-object" id="message-object">
+                    <div class ="message-profile-image circle">
+                        <img src="../messaging-icon.png" class="responsive-img circle profile-picture" alt="Profile">
+                    </div>
+                    <div class="message-bubble">
+                        <p class="message-sender">Sthembiso Musana</p>
+                        <p class="message-body">
+                            Hello world How are you world how are you feeling today feeling better?<br />
+                            <span class="message-time">00:00</span>
+                        </p>  
+                    </div>
+                </div>
             </div>
 
-            <div class="message-display">
-
+            <!-- Bottom -->
+            <div class="edit-bar">
+                <div class="edit-coll">
+                    <div class="attachment">
+                        <i class="material-icons">attachment</i>
+                    </div>
+                    <div class="edit-seg">
+                        <input type="text" placeholder="Message" name="message" class="edit-field no-padding" id ="message-field">
+                    </div>
+                    <a class="btn-floating btn-large waves-effect waves-light green-12 send-button" id="send">
+                        <i class="material-icons">send</i>
+                    </a>
+                </div>
+               
             </div>
-             <div class="edit-seg">
-                <input type="text" placeholder="Message" name="message" class="edit-field">
-             </div>  
-            
-    
         </div>
 
         <div class="chat-info col s6 no-padding">
+            <div class="profile-image-disp">
+
+            </div>
 
         </div>
     </div>

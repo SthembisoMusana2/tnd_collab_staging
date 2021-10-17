@@ -8,9 +8,7 @@ body{
     text-align: center;
 }
 
-.body{
-    /* border: 1px solid black; */
-}
+
 .row{
     /* border: 1px solid black; */
     display: flex;
