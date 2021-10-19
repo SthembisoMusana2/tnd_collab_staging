@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="./messaging_struct.css" />
+    <link rel="stylesheet" href="./mess-navigation.css" />
+    <link rel="stylesheet" href="./messageDisplay.css" />
+    <link rel="stylesheet" href="./profileView.css"  />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Messaging</title>
+</head>
+<body>
+    <div class="body row" id="body">
+        <div class="navigation col s6 no-padding">
+            <div class="profile">
+                <div class ="profile-image circle">
+                    <img src="../TND-Logo_-Unpacked-Parts.png" class="responsive-img circle profile-picture" alt="Profile">
+                </div>
+
+                <div class="title">
+                    <h5 class="title-text">Messaging</h4>
+                </div>
+                <div class="more" id="more-menu"></div>
+            </div>
+
+            <div class="contact-list" id="contact-list"> </div>
+        </div>
+
+        <div class="chats col s12 no-padding">
+            <!-- Top  -->
+            <div class="user-profile">
+                <div class ="profile-image circle">
+                    <img src="../messaging-icon.png" class="responsive-img circle profile-picture" alt="Profile">
+                </div>
+
+                <div class="title">
+                    <h5 class="profile-title-text">Profile of the Group</h4>
+                </div>
+                <div class="more" id="more-display-menu"></div>
+            </div>
+            <!-- Middle -->
+            <div class="message-display" id = "message-display">
+                <div class = "message-object" id="message-object">
+                    <div class ="message-profile-image circle">
+                        <img src="../messaging-icon.png" class="responsive-img circle profile-picture" alt="Profile">
+                    </div>
+                    <div class="message-bubble">
+                        <p class="message-sender">Sthembiso Musana</p>
+                        <p class="message-body">
+                            Hello world How are you world how are you feeling today feeling better?<br />
+                            <span class="message-time">00:00</span>
+                        </p>  
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom -->
+            <div class="edit-bar">
+                <div class="edit-coll">
+                    <div class="attachment">
+                        <i class="material-icons">attachment</i>
+                    </div>
+                    <div class="edit-seg">
+                        <input type="text" placeholder="Message" name="message" class="edit-field no-padding" id ="message-field">
+                    </div>
+                    <a class="btn-floating btn-large waves-effect waves-light green-12 send-button" id="send">
+                        <i class="material-icons">send</i>
+                    </a>
+                </div>
+               
+            </div>
+        </div>
+
+        <div class="chat-info col s6 no-padding">
+            <div class="profile-view-img-section">
+                <div class="profile-view-img circle">
+                    <img src="../TND-Logo_-Unpacked-Parts.png" class="responsive-img circle" alt="Profile View Image" />
+                </div>
+                <!-- <hr > -->
+            </div>
+
+            <div class="profile-view-group-info">
+                <h5 class="info-title">Group Info</h5>
+                <hr />
+
+                <p class="group-name">Group Name:</p>
+                <p class="group-description">Group Description:</p>
+                <p class="group-members">Group Members:</p><br />
+                <hr />
+                <h5 class="info-title">Members List</h5>
+                <hr />
+                <div class="group-members" id="group-members">
+                    <div class="group-member-object">
+                        <div class="group-member-img-obj">
+                            <img src="../file-icon.png" class="responsive-img circle group-member-img" alt="member-profile">
+                        </div>
+                        <div class="member-name">
+                            <span class="member-name-text">Sthembiso Musana</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+        </div>
+    </div>
+
+    <div class=  "row container footer">
+        
+    </div>
+</body>
+<script src="./updateUsers.js">
+</script>
+</html>

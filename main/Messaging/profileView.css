@@ -1,0 +1,42 @@
+.chat-info{
+    overflow-y: auto;
+}
+
+
+
+.profile-view-group-info{
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+.group-members{
+    display: flex;
+    flex-direction: column;
+    max-height: fit-content;
+    overflow-y: auto;
+}
+
+.group-member-object{
+    display: flex;
+    width: 100%;
+    /* border-bottom:1px solid black; */
+    cursor: pointer;
+
+
+}
+
+.group-member-object:hover{
+    background-color: rgb(212, 209, 209);
+}
+
+.group-member-img{
+    width:2em;
+    height:2em;
+    background-color: rgb(191, 197, 197);
+}
+
+
+.member-name{
+    margin-left: 1em;
+    padding-top: 0.2em;
+}

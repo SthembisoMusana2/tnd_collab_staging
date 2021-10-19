@@ -1,0 +1,144 @@
+
+.chats{
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid black;
+}
+
+.user-profile{
+    display:flex;
+    flex-flow: row;
+    /* border:1px solid black; */
+    width:100%;
+    height:5em;
+    background-color: rgb(41, 134, 122);
+}
+
+.profile-title-text{
+    color: rgb(223, 213, 213);
+    margin-left: 0.5em;
+    padding:0.5vh;
+    cursor: pointer;
+}
+
+.profile-title-text:hover{
+    color:rgb(56, 54, 54);
+}
+
+/* Message Structure */
+
+.message-display{
+    /* border:1px solid black; */
+    overflow-y: auto;
+}
+
+
+.message-object{
+    /* background-color: lawngreen; */
+    display:flex;
+    flex-direction: row;
+    margin-top: 1em;
+    cursor: default;
+}
+
+.message-object-sent{
+    display:flex;
+    flex-direction: row-reverse;
+    margin-top: 1em;
+    cursor: default;
+}
+
+.message-bubble{
+    background-color: rgb(56, 153, 116);
+    width: fit-content;
+    /* border: 1px solid black; */
+    margin-left: 0.2em;
+    margin-top: 0.3em;
+    border-radius: 1em;
+    padding: 5px;
+    /* padding: 0.2em; */
+}
+
+.message-sender{
+    padding:2px;
+    margin-top: 0px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 0px;
+    /* border:1px solid black; */
+}
+
+.message-body{
+    /* border:1px solid black; */
+    margin-top: 0px;
+    font-size: 16px;
+    max-width: 30em;
+}
+
+.message-time{
+    /* border:1px solid black; */
+    float: right;
+    font-size: 12px;
+}
+
+.message-profile-image{
+    background-color: rgb(203, 214, 224);
+    width: 2.5em;
+    height: 2.5em;
+    margin: 0.5vh;
+    /* border:1px solid black; */
+    /* border-radius: 2.5em; */
+}
+
+/* Edit field */
+.edit-bar{
+    margin-top: auto;
+    display: flex;
+    background-color: rgb(110, 110, 110);
+}
+
+.edit-coll{
+    display: flex;
+    width:100%;
+    height:fit-content;
+    /* border:1px solid black; */
+    margin-left: 1vh;
+    margin-bottom: 1.2vh;
+    margin-top: 1vh;
+    padding: 0;
+    border-radius: 2em;
+    background-color: rgb(181, 185, 185);
+    padding-left: 0.2vh;
+    padding-right: 0.2vh;
+}
+.attachment{
+    /* border:1px solid black; */
+    color: grey;
+    height: fit-content;
+    margin-top: 2vh;
+    margin-left: 0.5vh;
+    margin-right: 0.5vh;
+    border-radius: 2%;
+    cursor: pointer;
+}
+.attachment:hover{
+    background-color: rgb(108, 110, 110);
+}
+
+.edit-seg{
+    /* border:1px solid black; */
+    width:88%;
+    height:8vh;
+    margin-left: 0.3vh;
+    padding-right: 2vh;
+    color:black;
+}
+
+.edit-field{
+    padding:0;
+}
+
+.send-button{
+    margin-top: 0.4vh;
+    margin-left: 0.4vh;
+}
