@@ -1,15 +1,18 @@
 .chat-info{
     overflow-y: auto;
+    font-size: small;
 }
 
 
 
 .profile-view-group-info{
+    font-size: small;
     margin-left: 1em;
     margin-right: 1em;
 }
 
 .group-members{
+    font-size: small;
     display: flex;
     flex-direction: column;
     max-height: fit-content;

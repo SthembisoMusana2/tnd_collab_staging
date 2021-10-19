@@ -1,11 +1,13 @@
 
 class Message{
-    constructor(message, timestamp, image = null, sender = null, sent=0){
+    constructor(sender,recipientType, recipient, message, timestamp, image = null, sent=0){
         this.messagebody = message;
         this.timestamp = timestamp;
         this.messageImage = image;
         this.messageSender = sender;
         this.sent = sent;
+        this.recipientType = recipientType;
+        this.recipient = recipient;
     }
 
     getTimstamp(){
@@ -15,11 +17,21 @@ class Message{
         return this.messagebody;
     }
 
+    toJSON(){
+        return({
+            sender:this.messageSender,
+            recipientType:this.recipientType,
+            recipient:this.recipient,
+            messageBody:this.messagebody,
+            messageTime:this.timestamp
+        });
+    }
+
     toHtml(){
         this.messageImage ="../messaging-icon.png";
         
         return this.sent === 0?(
-            `<div class = "message-object-sent" id="message-object">
+            `<div class = "message-object-sent" >
             <div class ="message-profile-image circle">
                 <img src=${this.messageImage} class="responsive-img circle profile-picture" alt="Profile">
             </div>
@@ -31,7 +43,7 @@ class Message{
             </div>
         </div>`
         ): (
-            `<div class = "message-object" id="message-object">
+            `<div class = "message-object">
             <div class ="message-profile-image circle">
                 <img src=${this.messageImage} class="responsive-img circle profile-picture" alt="Profile">
             </div>
@@ -47,7 +59,7 @@ class Message{
 }
 
 class User{
-    constructor(username, messageList, profileImage){
+    constructor(username, messageList=[], profileImage){
         this.username= username;
         this.messageList = messageList;
         this.profileImage = profileImage;
@@ -68,7 +80,7 @@ class User{
     
                     <div class="user-name">
                         <h5 class="user-name-text no-padding">${this.username}</h4>
-                        <span class="lmessage">${this.latestMessage.getMessagebody()}</span>
+                        <span class="lmessage">${this.latestMessage != null?this.latestMessage.getMessagebody():'hello friend..'}</span>
                     </div>
                     <h6 class="timestamp">00:00</h6>
                 </div>`
@@ -90,21 +102,12 @@ class User{
     }
 }
 
-let messageTest = []
-
-for(let i=0; i<10;i++){
-    let tempMess = new Message("Hello friend, how are you? "+i, "00:10");
-    messageTest.push(tempMess);
-}
-
 let Users = [];
 
-for(let i=0; i<10;i++){
-    let tempUser = new User("Sthembiso "+i, messageTest, null);
+for(let i=0; i<10; i++){
+    let tempUser = new User('Sthembiso '+i);
     Users.push(tempUser);
 }
-
-console.log(Users[0].toHtml());
 
 let screenYOffset = 1;
 let groupMembersList = document.getElementById('group-members');
@@ -116,6 +119,27 @@ function updateGroupMembers(UsersList){
     }
 }
 
+async function sendMessage(message){
+    return fetch('http://127.0.0.1:8090/send', {
+        method:'POST',
+        body:JSON.stringify(message)
+    });
+}
+
+async function signin(user={username:String, email:String, id:id}){
+    return fetch('http://127.0.0.1:8090/signin', {
+        method:'POST',
+        body:JSON.stringify(user)
+    });
+}
+
+async function poll(user={username:null, email:null, id:id}){
+    return fetch('http://127.0.0.1:8090/poll', {
+        method:'POST',
+        body:JSON.stringify(user)
+    });
+}
+
 window.addEventListener('load', function(e){
     let contactList = document.getElementById('contact-list');
     let colHeight = document.getElementsByClassName('body');
@@ -125,7 +149,6 @@ window.addEventListener('load', function(e){
     let messageField = document.getElementById('message-field');
     let groupMembers = document.getElementById('group-members');
 
-    updateGroupMembers(Users);
 
     messageDisplayWind.style.height = this.innerHeight-this.innerHeight*0.2 + 'px';
     screenWindow[0].style.maxHeight = this.window.innerHeight+'px';
@@ -134,7 +157,7 @@ window.addEventListener('load', function(e){
     colHeight[0].style.height = (window.innerHeight-screenYOffset)+"px";
 
     for(let i =0; i<Users.length; i++){
-        contactList.innerHTML += Users[i].toHtml();
+        contactList.innerHTML += Users[i].toHtml()
     }
 
     sendButton.addEventListener('click', function(e){
@@ -157,6 +180,14 @@ window.addEventListener('load', function(e){
             }
         }
     });
+
+    let usersHtml = this.document.getElementsByClassName('user');
+
+    for(let i=0; i<usersHtml.length; i++){
+        usersHtml[i].addEventListener('click', function(e){
+            alert('Uou clicked')
+        });
+    }
 });
 
 window.addEventListener('resize', function(){
@@ -165,3 +196,31 @@ window.addEventListener('resize', function(){
     colHeight[0].style.height = (window.innerHeight-screenYOffset)+"px";
     messageDisplayWind.style.height = this.innerHeight-this.innerHeight*0.25 + 'px';
 });
+
+
+
+
+function searchArray(arrayObject = [], key){
+    let tempObj = arrayObject[0];
+
+    if(tempObj.username === key){
+        return tempObj;
+    }
+    else{ // binary search algorithm
+        
+        if(arrayObject.length > 1){
+            let middle = arrayObject[Math.floor(arrayObject.length/2)];
+
+            if(middle.username === key)
+                return middle;
+            else if(key > middle.username) // it means we should look from the second half
+                return searchArray(arrayObject.slice(Math.floor(arrayObject.length/2+1), 
+                        arrayObject.length), key); // looking from the middle of the array
+            
+            else
+                // search the second half
+                return searchArray(arrayObject.slice(0, Math.floor(arrayObject.length/2)), key); 
+        }else 
+            return null;
+    }
+}
