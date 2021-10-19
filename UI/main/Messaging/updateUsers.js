@@ -31,14 +31,14 @@ class Message{
         this.messageImage ="../messaging-icon.png";
         
         return this.sent === 0?(
-            `<div class = "message-object-sent" >
+            `<div class = "message-object-sent" style="margin-right:1%;" >
             <div class ="message-profile-image circle">
                 <img src=${this.messageImage} class="responsive-img circle profile-picture" alt="Profile">
             </div>
-            <div class="message-bubble" style="background-color: rgb(120, 126, 124);">
+            <div class="message-bubble" style="background-color: rgb(220, 226, 224);">
                 <p class="message-sender">${this.messageSender}</p>
                 <p class="message-body">${this.messagebody}
-                    <br /><span class="message-time">${this.timestamp}</span>
+                    <br /><span class="message-time">${this.timestamp.split(' ')[4]}</span>
                 </p>  
             </div>
         </div>`
@@ -50,7 +50,7 @@ class Message{
             <div class="message-bubble">
                 <p class="message-sender">${this.messageSender}</p>
                 <p class="message-body">${this.messagebody}
-                    <br /><span class="message-time">${this.timestamp}</span>
+                    <br /><span class="message-time">${this.timestamp.split(' ')[4]}</span>
                 </p>  
             </div>
         </div>`
@@ -140,6 +140,8 @@ async function poll(user={username:null, email:null, id:id}){
     });
 }
 
+console.log(Date(Date.now()).split(' '))
+
 window.addEventListener('load', function(e){
     let contactList = document.getElementById('contact-list');
     let colHeight = document.getElementsByClassName('body');
@@ -148,8 +150,7 @@ window.addEventListener('load', function(e){
     let sendButton = document.getElementById('send');
     let messageField = document.getElementById('message-field');
     let groupMembers = document.getElementById('group-members');
-
-
+   
     messageDisplayWind.style.height = this.innerHeight-this.innerHeight*0.2 + 'px';
     screenWindow[0].style.maxHeight = this.window.innerHeight+'px';
     screenWindow[0].style.overflowY = 'hidden';
@@ -163,7 +164,7 @@ window.addEventListener('load', function(e){
     sendButton.addEventListener('click', function(e){
         let messageBody = messageField.value;
         if(messageBody.length > 0){
-            let messageObject  = new Message(messageBody, "01:00", null, "Me");
+            let messageObject  = new Message('Sthembiso', 'single', "Sthembiso2", messageBody, Date(Date.now()));
             messageDisplayWind.innerHTML += messageObject.toHtml();
             messageField.value = '';
         }
@@ -174,7 +175,7 @@ window.addEventListener('load', function(e){
         if(e.key == 'Enter'){
             let messageBody = messageField.value;
             if(messageBody.length > 0){
-                let messageObject  = new Message(messageBody, "01:00", null, "Me");
+                let messageObject  = new Message('Sthembiso', 'single', "Sthembiso2", messageBody, Date(Date.now()));
                 messageDisplayWind.innerHTML += messageObject.toHtml();
                 messageField.value = '';
             }

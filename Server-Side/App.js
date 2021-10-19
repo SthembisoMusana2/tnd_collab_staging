@@ -70,11 +70,6 @@ app.use(express.text());
 app.use(express.urlencoded({extended:true}));
 
 
-
-app.get('/', (req, res)=>{
-    // console.log(req);
-});
-
 app.post('/send', (req, res)=>{
     let messageRef = JSON.parse(req.body);
     console.log(messageRef)
