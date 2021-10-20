@@ -19,10 +19,7 @@ addEventListener('load', function(e){
         e.preventDefault();
         signup.style.display = 'none';
         login.style.display = 'block';
-    })
+    });
 });
 
-window.addEventListener('contextmenu', function(e){
-    console.log(e);
-})
 

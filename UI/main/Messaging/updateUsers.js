@@ -61,7 +61,7 @@ class Message{
 class User{
     constructor(username, messageList=[], profileImage){
         this.username= username;
-        this.messageList = messageList;
+        this.messageList = [];
         this.profileImage = profileImage;
         this.latestMessage = messageList!==null?messageList[messageList.length-1]:null;
     }
@@ -100,14 +100,19 @@ class User{
         </div>`
         )
     }
+
+    messageListToHtml(){
+        let messObj = '';
+        for(let i=0; i<this.messageList.length; i++){
+            messObj +=this.messageList[i].toHtml();
+        }
+        return(messObj);
+    }
 }
 
 let Users = [];
 
-for(let i=0; i<10; i++){
-    let tempUser = new User('Sthembiso '+i);
-    Users.push(tempUser);
-}
+let currentUser = null;
 
 let screenYOffset = 1;
 let groupMembersList = document.getElementById('group-members');
@@ -140,7 +145,12 @@ async function poll(user={username:null, email:null, id:id}){
     });
 }
 
-console.log(Date(Date.now()).split(' '))
+async function start(user={username:null, email:null, id:id}){
+    return fetch('http://127.0.0.1:8090/users', {
+        method:'GET'
+    });
+}
+
 
 window.addEventListener('load', function(e){
     let contactList = document.getElementById('contact-list');
@@ -149,24 +159,62 @@ window.addEventListener('load', function(e){
     let messageDisplayWind = document.getElementById("message-display");
     let sendButton = document.getElementById('send');
     let messageField = document.getElementById('message-field');
+    let profileTitle = this.document.getElementById('profile-title');
     let groupMembers = document.getElementById('group-members');
    
     messageDisplayWind.style.height = this.innerHeight-this.innerHeight*0.2 + 'px';
     screenWindow[0].style.maxHeight = this.window.innerHeight+'px';
     screenWindow[0].style.overflowY = 'hidden';
-
     colHeight[0].style.height = (window.innerHeight-screenYOffset)+"px";
 
-    for(let i =0; i<Users.length; i++){
-        contactList.innerHTML += Users[i].toHtml()
-    }
 
+    start({username:'Sthembiso', email:'sthembisomusana2@gmail.com', id:'212412341233'})
+    .then(res=>{
+        res.text().then(data=>{
+            let dataJson = JSON.parse(data);
+            console.log(dataJson.friends.length)
+
+            for(let j=0; j<dataJson.friends.length; j++){
+               let tempUsers = dataJson.friends['friend '+j];
+               Users.push(new User(tempUsers.username, []));
+            }
+            Users.sort((user1, user2)=>{
+                if(user1.username>user2.username)return 1;
+                else if(user1.username<user2.username)return -1;
+                return 0
+            });
+
+            for(let i =0; i<Users.length; i++) contactList.innerHTML += Users[i].toHtml() 
+
+
+            let usersHtml = this.document.getElementsByClassName('user');
+
+            for(let i=0; i<usersHtml.length; i++){
+            usersHtml[i].addEventListener('click', function(e){
+                    let userName  = this.innerText.split('\n')[0];
+                    currentUser = searchArray(Users, userName);
+                    profileTitle.innerText = currentUser.username;
+                    messageDisplayWind.innerHTML = '';
+                    messageDisplayWind.innerHTML = currentUser.messageListToHtml();
+                });
+            }
+            
+        });
+
+    });
+    
     sendButton.addEventListener('click', function(e){
         let messageBody = messageField.value;
         if(messageBody.length > 0){
-            let messageObject  = new Message('Sthembiso', 'single', "Sthembiso2", messageBody, Date(Date.now()));
+            let messageObject  = new Message('Sthembiso', 'single', currentUser.username, messageBody, Date(Date.now()));
             messageDisplayWind.innerHTML += messageObject.toHtml();
             messageField.value = '';
+            currentUser.messageList.push(messageObject);
+            sendMessage(messageObject.toJSON())
+            .then(res=>{
+                console.log(res);
+            });
+            
         }
         
     });
@@ -175,20 +223,18 @@ window.addEventListener('load', function(e){
         if(e.key == 'Enter'){
             let messageBody = messageField.value;
             if(messageBody.length > 0){
-                let messageObject  = new Message('Sthembiso', 'single', "Sthembiso2", messageBody, Date(Date.now()));
+                let messageObject  = new Message('Sthembiso', 'single', currentUser.username, messageBody, Date(Date.now()));
                 messageDisplayWind.innerHTML += messageObject.toHtml();
                 messageField.value = '';
+                currentUser.messageList.push(messageObject);
+                sendMessage(messageObject.toJSON())
+                .then(res=>{
+                    // response to the message
+                });
             }
         }
     });
 
-    let usersHtml = this.document.getElementsByClassName('user');
-
-    for(let i=0; i<usersHtml.length; i++){
-        usersHtml[i].addEventListener('click', function(e){
-            alert('Uou clicked')
-        });
-    }
 });
 
 window.addEventListener('resize', function(){
@@ -197,6 +243,7 @@ window.addEventListener('resize', function(){
     colHeight[0].style.height = (window.innerHeight-screenYOffset)+"px";
     messageDisplayWind.style.height = this.innerHeight-this.innerHeight*0.25 + 'px';
 });
+
 
 
 
