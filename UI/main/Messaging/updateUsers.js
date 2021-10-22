@@ -1,6 +1,6 @@
 
 class Message{
-    constructor(sender,recipientType, recipient, message, timestamp, image = null, sent=0){
+    constructor(sender,recipientType, recipient, message, timestamp, group={name:'', flag:false}, image = null, sent=0){
         this.messagebody = message;
         this.timestamp = timestamp;
         this.messageImage = image;
@@ -8,6 +8,7 @@ class Message{
         this.sent = sent;
         this.recipientType = recipientType;
         this.recipient = recipient;
+        this.group = group;
     }
 
     getTimstamp(){
@@ -23,7 +24,8 @@ class Message{
             recipientType:this.recipientType,
             recipient:this.recipient,
             messageBody:this.messagebody,
-            messageTime:this.timestamp
+            messageTime:this.timestamp,
+            group:this.group
         });
     }
 
@@ -59,15 +61,30 @@ class Message{
 }
 
 class User{
-    constructor(username, messageList=[], profileImage){
+    constructor(username, email, id, messageList=[]){
         this.username= username;
+        this.useremail = email;
+        this.id = id;
         this.messageList = [];
-        this.profileImage = profileImage;
+        this.friendList = [];
+        this.profileImage = '';
         this.latestMessage = messageList!==null?messageList[messageList.length-1]:null;
     }
 
     setLatestMessage(message){
         this.latestMessage = message;
+    }
+
+    appendFriend(friend){
+        this.friendList.push(friend);
+    }
+
+    toJSON(){
+        return({
+            username:this.username,
+            email:this.useremail,
+            id:this.id
+        });
     }
 
     toHtml(){
@@ -110,14 +127,6 @@ class User{
     }
 }
 
-let Users = [];
-
-let currentUser = null;
-
-let screenYOffset = 1;
-let groupMembersList = document.getElementById('group-members');
-
-
 function updateGroupMembers(UsersList){
     for(let i = 0; i<UsersList.length; i++){
         groupMembersList.innerHTML += UsersList[i].getGroupMemberHtml();
@@ -147,10 +156,30 @@ async function poll(user={username:null, email:null, id:id}){
 
 async function start(user={username:null, email:null, id:id}){
     return fetch('http://127.0.0.1:8090/users', {
-        method:'GET'
+        method:'POST',
+        body:JSON.stringify(user)
     });
 }
 
+function signIn(){
+    let username;
+    let email = 'sthembisomusana2@gmail.com';
+    let id = '12413581283912';
+    username = prompt('Enter Name:');
+    // grab the user input from the screen and send it to firebase...
+    // get the user name and email from firebase and initialise user.
+    return new User(username, email, id, {});
+}
+
+let Users = [];
+
+
+const user = signIn();
+let currentFriend = null;
+
+
+let screenYOffset = 1;
+let groupMembersList = document.getElementById('group-members');
 
 window.addEventListener('load', function(e){
     let contactList = document.getElementById('contact-list');
@@ -167,42 +196,51 @@ window.addEventListener('load', function(e){
     screenWindow[0].style.overflowY = 'hidden';
     colHeight[0].style.height = (window.innerHeight-screenYOffset)+"px";
 
+    signin(user.toJSON()).then(function(res){
+        res.text()
+        .then(data=>{
+            console.log(data);
+        });
+    });
 
-    start({username:'Sthembiso', email:'sthembisomusana2@gmail.com', id:'212412341233'})
+    start({username:user.username, email:user.useremail, id:user.id}) // signing in to the message server
     .then(res=>{
         res.text().then(data=>{
             let dataJson = JSON.parse(data);
-            console.log(dataJson.friends.length)
 
-            for(let j=0; j<dataJson.friends.length; j++){
-               let tempUsers = dataJson.friends['friend '+j];
-               Users.push(new User(tempUsers.username, []));
-            }
-            Users.sort((user1, user2)=>{
-                if(user1.username>user2.username)return 1;
-                else if(user1.username<user2.username)return -1;
-                return 0
-            });
-
-            for(let i =0; i<Users.length; i++) contactList.innerHTML += Users[i].toHtml() 
-
-
-            let usersHtml = this.document.getElementsByClassName('user');
-
-            for(let i=0; i<usersHtml.length; i++){
-            usersHtml[i].addEventListener('click', function(e){
-                    let userName  = this.innerText.split('\n')[0];
-                    currentUser = searchArray(Users, userName);
-                    profileTitle.innerText = currentUser.username;
-                    messageDisplayWind.innerHTML = '';
-                    messageDisplayWind.innerHTML = currentUser.messageListToHtml();
-                });
+            if(dataJson.length > 0){
+                for(let j=0; j<dataJson.friends.length; j++){
+                    let tempUsers = dataJson.friends['friend '+j];
+                    user.appendFriend(new User(tempUsers.username,tempUsers.email, tempUsers.id, tempUsers.messages));
+                 }
+                 user.friendList.sort((user1, user2)=>{
+                     if(user1.username>user2.username)return 1;
+                     else if(user1.username<user2.username)return -1;
+                     return 0
+                 });
+     
+                 for(let i =0; i<user.friendList.length; i++) {
+                     contactList.innerHTML += user.friendList[i].toHtml();
+                 } 
+     
+     
+                 let usersHtml = this.document.getElementsByClassName('user');
+     
+                 for(let i=0; i<usersHtml.length; i++){
+                 usersHtml[i].addEventListener('click', function(e){
+                         let userName  = this.innerText.split('\n')[0];
+                         currentUser = searchArray(user.friendList, userName);
+                         profileTitle.innerText = currentUser.username;
+                         messageDisplayWind.innerHTML = '';
+                         messageDisplayWind.innerHTML = currentUser.messageListToHtml();
+                     });
+                 }
             }
             
         });
 
     });
-    
+
     sendButton.addEventListener('click', function(e){
         let messageBody = messageField.value;
         if(messageBody.length > 0){
@@ -235,6 +273,15 @@ window.addEventListener('load', function(e){
         }
     });
 
+    // setInterval(function(){ // poll for new messages
+    //     poll(user.toJSON())
+    //     .then(function(res){
+    //         res.text()
+    //         .then(data=>{
+    //             console.log(data);
+    //         })
+    //     })
+    // }, 500);
 });
 
 window.addEventListener('resize', function(){
