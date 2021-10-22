@@ -243,7 +243,7 @@ window.addEventListener('load', function(e){
         path.pop();
         path.push('signup.html');
         path = path.join('/');
-        this.window.location.pathname = path;
+        window.location.pathname = path;
     }
 
     let colHeight = document.getElementsByClassName('body');
