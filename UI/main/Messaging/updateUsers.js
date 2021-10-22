@@ -197,7 +197,7 @@ function signIn(){
     let username;
     let email = 'sthembisomusana2@gmail.com';
     let id = '12413581283912';
-    username = prompt('Enter Name:');
+    // username = prompt('Enter Name:');
     // grab the user input from the screen and send it to firebase...
     // get the user name and email from firebase and initialise user.
     return new User(username, email, id, {});
@@ -222,6 +222,7 @@ const messageField = document.getElementById('message-field');
 const displayMessage = document.getElementsByClassName('display-content')[0];
 
 const user = signIn();
+
 let currentFriend = null;
 
 
@@ -229,6 +230,22 @@ let screenYOffset = 1;
 let groupMembersList = document.getElementById('group-members');
 
 window.addEventListener('load', function(e){
+
+    let userDetails = { 
+        username:localStorage.getItem('username'), 
+        email:localStorage.getItem('email'), 
+        id:localStorage.getItem('id')
+    };
+
+    if(userDetails.username == null){
+        // Not signed in...
+        let path = window.location.pathname.split('/');
+        path.pop();
+        path.push('signup.html');
+        path = path.join('/');
+        this.window.location.pathname = path;
+    }
+
     let colHeight = document.getElementsByClassName('body');
     let screenWindow = document.getElementsByTagName('body');
     let sendButton = document.getElementById('send');
@@ -315,39 +332,39 @@ window.addEventListener('load', function(e){
         }
     });
 
-    setInterval(function(){ // poll for new messages
-        poll(user.toJSON())
-        .then(function(res){
-            res.text()
-            .then(data=>{
-                let resJSON = JSON.parse(data);
-                let friend
-                if(resJSON.length > 0)
-                for(let i = 0; i<resJSON.length; i++){
-                    console.log(resJSON['message'+i].sender)
-                    friend = searchArray(user.friendList, resJSON['message'+i].sender);
+    // setInterval(function(){ // poll for new messages
+    //     poll(user.toJSON())
+    //     .then(function(res){
+    //         res.text()
+    //         .then(data=>{
+    //             let resJSON = JSON.parse(data);
+    //             let friend
+    //             if(resJSON.length > 0)
+    //             for(let i = 0; i<resJSON.length; i++){
+    //                 console.log(resJSON['message'+i].sender)
+    //                 friend = searchArray(user.friendList, resJSON['message'+i].sender);
        
-                    if(friend == null && resJSON.length > 0){
-                        //add friend in the server...
-                        let tempFriend = new User(resJSON['message'+i].sender, 'default', 'defualt', [createMessageObject(resJSON['message'+i])]);
-                        contactList.innerHTML += tempFriend.toHtml();
-                        user.appendFriend(tempFriend);
-                        updateUserClick();
-                        console.log(friend)
-                    }
-                    else if(friend != null && resJSON.length > 0){
-                        friend.messageList.push(createMessageObject(resJSON['message'+i])); // add message to history
-                        if(friend === currentFriend){
-                            // update the screen..
-                            messageDisplayWind.innerHTML = currentFriend.messageListToHtml();
-                            // scroll down;
-                        }
-                    }
-                }
+    //                 if(friend == null && resJSON.length > 0){
+    //                     //add friend in the server...
+    //                     let tempFriend = new User(resJSON['message'+i].sender, 'default', 'defualt', [createMessageObject(resJSON['message'+i])]);
+    //                     contactList.innerHTML += tempFriend.toHtml();
+    //                     user.appendFriend(tempFriend);
+    //                     updateUserClick();
+    //                     console.log(friend)
+    //                 }
+    //                 else if(friend != null && resJSON.length > 0){
+    //                     friend.messageList.push(createMessageObject(resJSON['message'+i])); // add message to history
+    //                     if(friend === currentFriend){
+    //                         // update the screen..
+    //                         messageDisplayWind.innerHTML = currentFriend.messageListToHtml();
+    //                         // scroll down;
+    //                     }
+    //                 }
+    //             }
                 
-            });
-        });
-    }, 500);
+    //         });
+    //     });
+    // }, 500);
 });
 
 window.addEventListener('resize', function(){

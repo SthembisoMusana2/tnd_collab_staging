@@ -16,7 +16,7 @@ class User{
     }
     updateMessageList(message){
         this.recentMessages.push(message);
-        this.historyList.push(message);
+        this.historyList.push(message); // doesnt matter who the message is coming from just add it.
     }
     clearRecentList(){
         this.recentMessages.splice(0, this.recentMessages.length);
@@ -47,8 +47,7 @@ class User{
             }
             return(tempObj);
         }
-        return {length:0};
-        
+        return {length:0}; 
     }
 
     toJSON(){
@@ -117,12 +116,11 @@ app.post('/users', (req, res)=>{ // request for your friend list
     if(userObj!= null) res.end(JSON.stringify(userObj.friendListToJSON()));    
     else res.end(JSON.stringify({length:0}))
 
-    console.log(users);
+    // console.log(users);
 });
 
 app.post('/send', (req, res)=>{
     let messageRef = JSON.parse(req.body);
-    // console.log(messageRef) 
     // route message from one user to the next
     if(messageRef.recipientType === 'single'){
         let recipient  = messageRef.recipient;
@@ -164,7 +162,7 @@ app.post('/addFriend', (req, res)=>{
     let user = JSON.parse(req.body);
     let userObj = searchArray(users, user.searchString);
     if(userObj == null){
-        res.end({status:500});
+        res.end(JSON.stringify({status:500}));
         return;
     }
     else{
