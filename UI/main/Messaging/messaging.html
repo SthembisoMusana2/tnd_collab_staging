@@ -9,10 +9,26 @@
     <link rel="stylesheet" href="./mess-navigation.css" />
     <link rel="stylesheet" href="./messageDisplay.css" />
     <link rel="stylesheet" href="./profileView.css"  />
+    <link rel="stylesheet" href="./search.css" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <title>Messaging</title>
 </head>
 <body>
+
+    <div class="add-user-overlay">
+        <div class="close-overlay">
+            <span id ="close-overlay-t" style="color: white; font-size:xx-large; padding-left: 2%;">X</span>
+        </div>
+        <div class="search-user container">
+            <h5 class="search-title">Search </h5>
+            <div class="search-field">
+                <input type="search" placeholder="Type friend's username" id="search-string" class="browser-default">
+                <input type="button" value="Go" class="browser-default search-button" id="search-button" />
+            </div>
+            <h6 id="results-heading">Results ...</h6>
+            <div class="search-results"></div>
+        </div>
+    </div>
     <div class="body row" id="body">
         <div class="navigation col s6 no-padding">
             <div class="profile">
@@ -23,6 +39,9 @@
                 <div class="title">
                     <h5 class="title-text">Messaging</h4>
                 </div>
+                <div class="add-user" id="add-user">
+                    <img src="./add member.svg" alt="add-user" class="responsive-img add-user-icon"  />
+                </div>
                 <div class="more" id="more-menu"></div>
             </div>
 
@@ -31,60 +50,63 @@
 
         <div class="chats col s12 no-padding">
             <!-- Top  -->
-            <div class="user-profile">
-                <div class ="user-profile-image circle">
-                    <img src="../messaging-icon.png" class="responsive-img circle profile-picture" alt="Profile">
-                </div>
-
-                <div class="title">
-                    <h5 class="profile-title-text" id="profile-title">Profile of the Group</h4>
-                </div>
-                <!-- <div class="more" id="more-display-menu"></div> -->
-            </div>
-            <!-- Middle -->
-            <div class="message-display" id = "message-display">
-                <div class = "message-object" id="message-object">
-                    <div class ="message-profile-image circle">
-                        <img src="../messaging-icon.png"  id = 'profile-img' class="responsive-img circle profile-picture" alt="Profile">
+            <div class="display-content">
+                <div class="user-profile">
+                    <div class ="user-profile-image circle">
+                        <img src="../messaging-icon.png" class="responsive-img circle profile-picture" alt="Profile">
                     </div>
-                    <div class="message-bubble">
-                        <p class="message-sender">Sthembiso Musana</p>
-                        <p class="message-body">
-                            Hello world How are you world how are you feeling today feeling better?<br />
-                            <span class="message-time">00:00</span>
-                        </p>  
+    
+                    <div class="title">
+                        <h5 class="profile-title-text" id="profile-title">Profile of the Group</h4>
+                    </div>
+                    <!-- <div class="more" id="more-display-menu"></div> -->
+                </div>
+                <!-- Middle -->
+                <div class="message-display" id = "message-display">
+                    <div class = "message-object" id="message-object">
+                        <div class ="message-profile-image circle">
+                            <img src="../messaging-icon.png"  id = 'profile-img' class="responsive-img circle profile-picture" alt="Profile">
+                        </div>
+                        <div class="message-bubble">
+                            <p class="message-sender">Sthembiso Musana</p>
+                            <p class="message-body">
+                                Hello world How are you world how are you feeling today feeling better?<br />
+                                <span class="message-time">00:00</span>
+                            </p>  
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Bottom -->
+                <div class="edit-bar">
+                    <div class="edit-coll">
+                       
+                        <div class="edit-seg">
+                            <input type="text" placeholder="Message" name="message" class="browser-default edit-field" id ="message-field">
+                        </div>
+                    
+                        <a class="btn-floating waves-effect waves-light green-12 no-padding send-button" id="send">
+                            <!-- <i class="material-icons">send</i> -->
+                            <!-- <?xml version="1.0" encoding="utf-8"?> -->
+                            <!-- Generator: Adobe Illustrator 25.3.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+                            <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            viewBox="0 0 1366 768" style="enable-background:new 0 0 1366 768;" xml:space="preserve">
+                            <style type="text/css">
+                            .st0{fill:none;}
+                            .st1{fill:#ffffff;stroke:#ffffff;stroke-miterlimit:10;}
+                            </style>
+                            <path class="st0" d="M1015,371"/>
+                            <path class="st1" d="M1098.16,371.76C902.27,285.01,706.39,198.25,510.5,111.5c8,73,16,146,24,219c104.67,14,209.33,28,314,42
+                            C931.72,372.25,1014.94,372.01,1098.16,371.76z"/>
+                            <path class="st0" d="M996.34,337.8"/>
+                            <path class="st1" d="M1093.15,372.94C900.26,458.79,707.38,544.65,514.5,630.5c8.33-76,16.67-152,25-228c105-11,210-22,315-33
+                            C934.05,370.65,1013.6,371.79,1093.15,372.94z"/>
+                            </svg>
+                        </a>
                     </div>
                 </div>
             </div>
-
-            <!-- Bottom -->
-            <div class="edit-bar">
-                <div class="edit-coll">
-                   
-                    <div class="edit-seg">
-                        <input type="text" placeholder="Message" name="message" class="browser-default edit-field" id ="message-field">
-                    </div>
-                
-                    <a class="btn-floating waves-effect waves-light green-12 no-padding send-button" id="send">
-                        <!-- <i class="material-icons">send</i> -->
-                        <!-- <?xml version="1.0" encoding="utf-8"?> -->
-                        <!-- Generator: Adobe Illustrator 25.3.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                        viewBox="0 0 1366 768" style="enable-background:new 0 0 1366 768;" xml:space="preserve">
-                        <style type="text/css">
-                        .st0{fill:none;}
-                        .st1{fill:#ffffff;stroke:#ffffff;stroke-miterlimit:10;}
-                        </style>
-                        <path class="st0" d="M1015,371"/>
-                        <path class="st1" d="M1098.16,371.76C902.27,285.01,706.39,198.25,510.5,111.5c8,73,16,146,24,219c104.67,14,209.33,28,314,42
-                        C931.72,372.25,1014.94,372.01,1098.16,371.76z"/>
-                        <path class="st0" d="M996.34,337.8"/>
-                        <path class="st1" d="M1093.15,372.94C900.26,458.79,707.38,544.65,514.5,630.5c8.33-76,16.67-152,25-228c105-11,210-22,315-33
-                        C934.05,370.65,1013.6,371.79,1093.15,372.94z"/>
-                        </svg>
-                    </a>
-                </div>
-            </div>
+            
             
         </div>
 
@@ -129,4 +151,5 @@
 </body>
 <script src="./updateUsers.js">
 </script>
+<script src="./addUsers.js"></script>
 </html>

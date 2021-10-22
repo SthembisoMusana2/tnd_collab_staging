@@ -1,6 +1,6 @@
 
 class Message{
-    constructor(sender,recipientType, recipient, message, timestamp, group={name:'', flag:false}, image = null, sent=0){
+    constructor(sender,recipientType, recipient, message, timestamp, sent=0, group={name:'', flag:false}, image = null){
         this.messagebody = message;
         this.timestamp = timestamp;
         this.messageImage = image;
@@ -77,6 +77,12 @@ class User{
 
     appendFriend(friend){
         this.friendList.push(friend);
+
+        this.friendList.sort((user1, user2)=>{
+            if(user1.username > user2.username)return -1;
+            else if(user1.username < user2.username) return 1;
+            return 0;
+        })
     }
 
     toJSON(){
@@ -102,6 +108,15 @@ class User{
                     <h6 class="timestamp">00:00</h6>
                 </div>`
         );
+    }
+
+    refreshFriendList(){
+        let friendListHtml = '';
+
+        for(let i=0; i<this.friendList.length; i++){
+            friendListHtml += this.friendList[i].toHtml();
+        }
+        return(friendListHtml);
     }
 
     getGroupMemberHtml(){
@@ -161,6 +176,23 @@ async function start(user={username:null, email:null, id:id}){
     });
 }
 
+function updateUserClick(){
+    let usersHtml = document.getElementsByClassName('user');
+    for(let i=0; i<usersHtml.length; i++){
+    usersHtml[i].addEventListener('click', function(e){
+            let userName  = usersHtml[i].innerText.split('\n')[0];
+            console.log(userName);
+            currentFriend = searchArray(user.friendList, userName);
+            if(currentFriend != null){
+                displayMessage.style.display = 'block';
+                profileTitle.innerText = currentFriend.username;
+                messageDisplayWind.innerHTML = '';
+                messageDisplayWind.innerHTML = currentFriend.messageListToHtml();
+            }
+        });
+    }
+}
+
 function signIn(){
     let username;
     let email = 'sthembisomusana2@gmail.com';
@@ -171,8 +203,23 @@ function signIn(){
     return new User(username, email, id, {});
 }
 
-let Users = [];
+function createMessageObject(message={sender:'', recipientType:this.recipientType,
+recipient:'',
+messageBody:'',
+messageTime:'',
+sent:0,
+group:''}){
 
+    return new Message(message.sender, message.recipientType,message.recipient, message.messageBody, message.messageTime, 1, {});
+
+}
+
+let Users = [];
+const contactList = document.getElementById('contact-list');
+const profileTitle = document.getElementById('profile-title');
+const messageDisplayWind = document.getElementById("message-display");
+const messageField = document.getElementById('message-field');
+const displayMessage = document.getElementsByClassName('display-content')[0];
 
 const user = signIn();
 let currentFriend = null;
@@ -182,14 +229,13 @@ let screenYOffset = 1;
 let groupMembersList = document.getElementById('group-members');
 
 window.addEventListener('load', function(e){
-    let contactList = document.getElementById('contact-list');
     let colHeight = document.getElementsByClassName('body');
     let screenWindow = document.getElementsByTagName('body');
-    let messageDisplayWind = document.getElementById("message-display");
     let sendButton = document.getElementById('send');
-    let messageField = document.getElementById('message-field');
-    let profileTitle = this.document.getElementById('profile-title');
+    
+    
     let groupMembers = document.getElementById('group-members');
+    
    
     messageDisplayWind.style.height = this.innerHeight-this.innerHeight*0.2 + 'px';
     screenWindow[0].style.maxHeight = this.window.innerHeight+'px';
@@ -203,7 +249,7 @@ window.addEventListener('load', function(e){
         });
     });
 
-    start({username:user.username, email:user.useremail, id:user.id}) // signing in to the message server
+    start(user.toJSON()) // signing in to the message server
     .then(res=>{
         res.text().then(data=>{
             let dataJson = JSON.parse(data);
@@ -222,37 +268,28 @@ window.addEventListener('load', function(e){
                  for(let i =0; i<user.friendList.length; i++) {
                      contactList.innerHTML += user.friendList[i].toHtml();
                  } 
-     
-     
-                 let usersHtml = this.document.getElementsByClassName('user');
-     
-                 for(let i=0; i<usersHtml.length; i++){
-                 usersHtml[i].addEventListener('click', function(e){
-                         let userName  = this.innerText.split('\n')[0];
-                         currentUser = searchArray(user.friendList, userName);
-                         profileTitle.innerText = currentUser.username;
-                         messageDisplayWind.innerHTML = '';
-                         messageDisplayWind.innerHTML = currentUser.messageListToHtml();
-                     });
-                 }
+                updateUserClick();
             }
             
         });
 
     });
 
+    if(currentFriend == null){
+        displayMessage.style.display = 'none';
+    }
+
     sendButton.addEventListener('click', function(e){
         let messageBody = messageField.value;
         if(messageBody.length > 0){
-            let messageObject  = new Message('Sthembiso', 'single', currentUser.username, messageBody, Date(Date.now()));
+            let messageObject  = new Message(user.username, 'single', currentFriend.username, messageBody, Date(Date.now()));
             messageDisplayWind.innerHTML += messageObject.toHtml();
             messageField.value = '';
-            currentUser.messageList.push(messageObject);
+            currentFriend.messageList.push(messageObject);
             sendMessage(messageObject.toJSON())
             .then(res=>{
-                console.log(res);
-            });
-            
+                // console.log(res);
+            });  
         }
         
     });
@@ -261,27 +298,56 @@ window.addEventListener('load', function(e){
         if(e.key == 'Enter'){
             let messageBody = messageField.value;
             if(messageBody.length > 0){
-                let messageObject  = new Message('Sthembiso', 'single', currentUser.username, messageBody, Date(Date.now()));
+                let messageObject  = new Message(user.username, 'single', currentFriend.username, messageBody, Date(Date.now()));
                 messageDisplayWind.innerHTML += messageObject.toHtml();
                 messageField.value = '';
-                currentUser.messageList.push(messageObject);
+                currentFriend.messageList.push(messageObject);
                 sendMessage(messageObject.toJSON())
                 .then(res=>{
-                    // response to the message
+                    res.text()
+                    .then(data=>{
+                        // let message = createMessageObject(JSON.parse(data));
+                        // currentFriend.messageList.push(message);
+                        // messageDisplayWind.innerHTML += message.toHtml();
+                    });
                 });
             }
         }
     });
 
-    // setInterval(function(){ // poll for new messages
-    //     poll(user.toJSON())
-    //     .then(function(res){
-    //         res.text()
-    //         .then(data=>{
-    //             console.log(data);
-    //         })
-    //     })
-    // }, 500);
+    setInterval(function(){ // poll for new messages
+        poll(user.toJSON())
+        .then(function(res){
+            res.text()
+            .then(data=>{
+                let resJSON = JSON.parse(data);
+                let friend
+                if(resJSON.length > 0)
+                for(let i = 0; i<resJSON.length; i++){
+                    console.log(resJSON['message'+i].sender)
+                    friend = searchArray(user.friendList, resJSON['message'+i].sender);
+       
+                    if(friend == null && resJSON.length > 0){
+                        //add friend in the server...
+                        let tempFriend = new User(resJSON['message'+i].sender, 'default', 'defualt', [createMessageObject(resJSON['message'+i])]);
+                        contactList.innerHTML += tempFriend.toHtml();
+                        user.appendFriend(tempFriend);
+                        updateUserClick();
+                        console.log(friend)
+                    }
+                    else if(friend != null && resJSON.length > 0){
+                        friend.messageList.push(createMessageObject(resJSON['message'+i])); // add message to history
+                        if(friend === currentFriend){
+                            // update the screen..
+                            messageDisplayWind.innerHTML = currentFriend.messageListToHtml();
+                            // scroll down;
+                        }
+                    }
+                }
+                
+            });
+        });
+    }, 500);
 });
 
 window.addEventListener('resize', function(){
@@ -294,28 +360,28 @@ window.addEventListener('resize', function(){
 
 
 
-
 function searchArray(arrayObject = [], key){
     let tempObj = arrayObject[0];
-
-    if(tempObj.username === key){
-        return tempObj;
-    }
-    else{ // binary search algorithm
-        
-        if(arrayObject.length > 1){
-            let middle = arrayObject[Math.floor(arrayObject.length/2)];
-
-            if(middle.username === key)
-                return middle;
-            else if(key > middle.username) // it means we should look from the second half
-                return searchArray(arrayObject.slice(Math.floor(arrayObject.length/2+1), 
-                        arrayObject.length), key); // looking from the middle of the array
+    if(arrayObject.length > 0){
+        if(tempObj.username === key){
+            return tempObj;
+        }
+        else{ // binary search algorithm
             
-            else
-                // search the second half
-                return searchArray(arrayObject.slice(0, Math.floor(arrayObject.length/2)), key); 
-        }else 
-            return null;
+            if(arrayObject.length > 1){
+                let middle = arrayObject[Math.floor(arrayObject.length/2)];
+    
+                if(middle.username === key)
+                    return middle;
+                else if(key > middle.username) // it means we should look from the second half
+                    return searchArray(arrayObject.slice(Math.floor(arrayObject.length/2+1), 
+                            arrayObject.length), key); // looking from the middle of the array
+                
+                else
+                    // search the second half
+                    return searchArray(arrayObject.slice(0, Math.floor(arrayObject.length/2)), key); 
+            }else 
+                return null;
+        }
     }
 }

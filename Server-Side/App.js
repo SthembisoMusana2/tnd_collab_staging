@@ -18,6 +18,9 @@ class User{
         this.recentMessages.push(message);
         this.historyList.push(message);
     }
+    clearRecentList(){
+        this.recentMessages.splice(0, this.recentMessages.length);
+    }
 
     isRecentEmpty(){
         return (this.recentMessages.length === 0);
@@ -37,7 +40,8 @@ class User{
 
     recentListJSON(){
         if(!this.isRecentEmpty()){
-            let tempObj = {length:this.recentListJSON.length};
+            let tempObj = {};
+            tempObj.length = this.recentMessages.length;
             for(let i=0; i<this.recentMessages.length; i++){
                 tempObj['message'+i] = this.recentMessages[i]
             }
@@ -110,16 +114,20 @@ app.post('/signin', (req, res)=>{ // register to the active users list
 app.post('/users', (req, res)=>{ // request for your friend list
     let user = JSON.parse(req.body);
     let userObj = searchArray(users, user.username);
-    res.end(JSON.stringify(userObj.friendListToJSON()));    
+    if(userObj!= null) res.end(JSON.stringify(userObj.friendListToJSON()));    
+    else res.end(JSON.stringify({length:0}))
+
+    console.log(users);
 });
 
 app.post('/send', (req, res)=>{
     let messageRef = JSON.parse(req.body);
-    console.log(messageRef) // route message from one user to the next
+    // console.log(messageRef) 
+    // route message from one user to the next
     if(messageRef.recipientType === 'single'){
         let recipient  = messageRef.recipient;
         let user = searchArray(users, recipient);
-        user.appendMessageList(messageRef);
+        user.updateMessageList(messageRef);
         messageRef.status = 'sent'
         res.end(JSON.stringify(messageRef));
         return;
@@ -128,7 +136,7 @@ app.post('/send', (req, res)=>{
         let groupName = messageRef.group.name;
         let group = searchArray(groups, groupName);
         // route message to every user in the group ... 
-        group.appendMessageList(messageRef);
+        group.updateMessageList(messageRef);
         messageRef.status = 'sent';
         res.end(JSON.stringify(messageRef));
         return;
@@ -141,14 +149,15 @@ app.post('/poll', (req, res)=>{
     if(user != null){
         if(!user.isRecentEmpty()){
             res.end(JSON.stringify(user.recentListJSON()));
+            user.clearRecentList();
             return;
         }
         else{
-            res.end('empty');
+            res.end(JSON.stringify({length:0}));
             return;
         }
     }
-    res.end('User not found!');
+    res.end(JSON.stringify({status:'User not found!'}));
 });
 
 app.post('/addFriend', (req, res)=>{
@@ -167,6 +176,22 @@ app.post('/addFriend', (req, res)=>{
         return;
     }
 });
+
+app.post('/search', (req, res)=>{
+    let searchData = JSON.parse(req.body);
+    let userObj = searchArray(users, searchData.name);
+
+    if(userObj != null){
+        let tempJSON = userObj.toJSON();
+        tempJSON.length = 1;
+        res.end(JSON.stringify(tempJSON));
+        return;
+    }
+    else{
+        res.end(JSON.stringify({length:0}));
+        return;
+    }
+})
 
 
 function searchArray(arrayObject = [], key){
