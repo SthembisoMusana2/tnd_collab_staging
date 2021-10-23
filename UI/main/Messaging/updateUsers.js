@@ -31,7 +31,11 @@ class Message{
 
     toHtml(){
         this.messageImage ="../messaging-icon.png";
-        
+        let timeVar = this.timestamp.split(' ')[4].split(':');
+        timeVar.pop()
+        timeVar[0] += ':'
+        let time = timeVar[0]+''+timeVar[1];
+
         return this.sent === 0?(
             `<div class = "message-object-sent" style="margin-right:1%;" >
             <div class ="message-profile-image circle">
@@ -40,7 +44,7 @@ class Message{
             <div class="message-bubble" style="background-color: rgb(220, 226, 224);">
                 <p class="message-sender">${this.messageSender}</p>
                 <p class="message-body">${this.messagebody}
-                    <br /><span class="message-time">${this.timestamp.split(' ')[4]}</span>
+                    <br /><span class="message-time">${time}</span>
                 </p>  
             </div>
         </div>`
@@ -52,7 +56,7 @@ class Message{
             <div class="message-bubble">
                 <p class="message-sender">${this.messageSender}</p>
                 <p class="message-body">${this.messagebody}
-                    <br /><span class="message-time">${this.timestamp.split(' ')[4]}</span>
+                    <br /><span class="message-time">${time}</span>
                 </p>  
             </div>
         </div>`
@@ -221,7 +225,7 @@ const messageDisplayWind = document.getElementById("message-display");
 const messageField = document.getElementById('message-field');
 const displayMessage = document.getElementsByClassName('display-content')[0];
 
-const user = signIn();
+let user;
 
 let currentFriend = null;
 
@@ -244,6 +248,9 @@ window.addEventListener('load', function(e){
         path.push('signup.html');
         path = path.join('/');
         window.location.pathname = path;
+    }else{
+        user = new User(userDetails.username, userDetails.email, userDetails.id, []);
+        console.log(user);
     }
 
     let colHeight = document.getElementsByClassName('body');
@@ -288,7 +295,8 @@ window.addEventListener('load', function(e){
                 updateUserClick();
             }
             
-        });
+        })
+        .catch(err=>console.log("There's an error: ", err));
 
     });
 
@@ -332,39 +340,39 @@ window.addEventListener('load', function(e){
         }
     });
 
-    // setInterval(function(){ // poll for new messages
-    //     poll(user.toJSON())
-    //     .then(function(res){
-    //         res.text()
-    //         .then(data=>{
-    //             let resJSON = JSON.parse(data);
-    //             let friend
-    //             if(resJSON.length > 0)
-    //             for(let i = 0; i<resJSON.length; i++){
-    //                 console.log(resJSON['message'+i].sender)
-    //                 friend = searchArray(user.friendList, resJSON['message'+i].sender);
+    setInterval(function(){ // poll for new messages
+        poll(user.toJSON())
+        .then(function(res){
+            res.text()
+            .then(data=>{
+                let resJSON = JSON.parse(data);
+                let friend
+                if(resJSON.length > 0)
+                for(let i = 0; i<resJSON.length; i++){
+                    console.log(resJSON['message'+i].sender)
+                    friend = searchArray(user.friendList, resJSON['message'+i].sender);
        
-    //                 if(friend == null && resJSON.length > 0){
-    //                     //add friend in the server...
-    //                     let tempFriend = new User(resJSON['message'+i].sender, 'default', 'defualt', [createMessageObject(resJSON['message'+i])]);
-    //                     contactList.innerHTML += tempFriend.toHtml();
-    //                     user.appendFriend(tempFriend);
-    //                     updateUserClick();
-    //                     console.log(friend)
-    //                 }
-    //                 else if(friend != null && resJSON.length > 0){
-    //                     friend.messageList.push(createMessageObject(resJSON['message'+i])); // add message to history
-    //                     if(friend === currentFriend){
-    //                         // update the screen..
-    //                         messageDisplayWind.innerHTML = currentFriend.messageListToHtml();
-    //                         // scroll down;
-    //                     }
-    //                 }
-    //             }
+                    if(friend == null && resJSON.length > 0){
+                        //add friend in the server...
+                        let tempFriend = new User(resJSON['message'+i].sender, 'default', 'defualt', [createMessageObject(resJSON['message'+i])]);
+                        contactList.innerHTML += tempFriend.toHtml();
+                        user.appendFriend(tempFriend);
+                        updateUserClick();
+                        console.log(friend)
+                    }
+                    else if(friend != null && resJSON.length > 0){
+                        friend.messageList.push(createMessageObject(resJSON['message'+i])); // add message to history
+                        if(friend === currentFriend){
+                            // update the screen..
+                            messageDisplayWind.innerHTML = currentFriend.messageListToHtml();
+                            // scroll down;
+                        }
+                    }
+                }
                 
-    //         });
-    //     });
-    // }, 500);
+            });
+        });
+    }, 500);
 });
 
 window.addEventListener('resize', function(){

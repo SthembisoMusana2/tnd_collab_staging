@@ -35,9 +35,12 @@ body{
     border: none;
     background-color: rgb(228, 222, 222);
     border-radius: 0.5em;
+    font-size: medium;
+    padding-left: 5%;
 }
 .field::placeholder{
     color:rgb(151, 149, 149);
+    padding-left: 5%;
 }
 
 .submit{

@@ -5,6 +5,13 @@
     background-color: rgb(192, 189, 189);
 }
 
+.display-content{
+    /* border: 1px solid rgb(182, 21, 21); */
+    display: flex;
+    flex-direction: column;
+    flex-flow: column;
+}
+
 .user-profile{
     display:flex;
     flex-flow: row;
@@ -38,6 +45,7 @@
 
 .message-display{
     overflow-y: auto;
+    /* border: 1px solid black; */
 }
 
 
@@ -88,22 +96,25 @@
     width: 2em;
     height: 2em;
     margin-left: 0.1em;
-    /* border:1px solid black; */
-    /* border-radius: 2.5em; */
 }
 
 /* Edit field */
 .edit-bar{
-    margin-top: auto;
+    position: fixed;
+    bottom:1%;
+    width: 48%;
     display: flex;
     background-color: rgb(192, 189, 189);
+     /* border: 1px solid black; */
+    
+    /* margin-left: 1%; */
 }
 
 .edit-coll{
     display: flex;
     width:100%;
     height:8vh;
-    margin-bottom: 1.2vh;
+    /* margin-bottom: 1vh; */
     padding-left: 0.2em;
     border-radius: 2vh;
 }
@@ -117,6 +128,7 @@
     border-radius: 2vh;
     padding-left: 2%;
     background-color: white;
+    /* border: 1px solid; */
 }
 
 .edit-field{

@@ -1,3 +1,10 @@
+let express = require('express');
+const {signIn, createUser, usersList} = require('./signupLogin');
+
+const mongoose = require('mongoose');
+const UserModel = require('./UserSchema');
+
+
 class User{
     constructor(username, email, id, historyList = []){
         this.username = username;
@@ -13,6 +20,13 @@ class User{
 
     appendFriendList(user){
         this.friendsList.push(user);
+        if(this.friendsList.length>0){
+            this.friendsList.sort((user1, user2)=>{
+                if(user1.username > user2.username)return -1;
+                else if (user1.username < user2.username) return 1;
+                return 0;
+            });
+        }
     }
     updateMessageList(message){
         this.recentMessages.push(message);
@@ -80,31 +94,83 @@ class Group{
     }
 }
 
-const { time } = require('console');
-const { Hash, createHash } = require('crypto');
-let express = require('express');
-const { endianness } = require('os');
+function searchArray(arrayObject = [], key){
+    let tempObj = arrayObject[0];
+    if(arrayObject.length > 0){
+        if(tempObj.username === key){
+            return tempObj;
+        }
+        else{ // binary search algorithm
+            
+            if(arrayObject.length > 1){
+                let middle = arrayObject[Math.floor(arrayObject.length/2)];
+    
+                if(middle.username === key)
+                    return middle;
+                else if(key > middle.username) // it means we should look from the second half
+                    return searchArray(arrayObject.slice(Math.floor(arrayObject.length/2+1), 
+                            arrayObject.length), key); // looking from the middle of the array
+                
+                else
+                    // search the second half
+                    return searchArray(arrayObject.slice(0, Math.floor(arrayObject.length/2)), key); 
+            }else 
+                return null;
+        }
+    }
+}
+
+function sortArrayUsers(array=[], scheme){
+    array.sort((user1, user2)=>{
+        if(user1[scheme]> user2[scheme])return -1;
+        else if(user1[scheme] < user2[scheme])return 1;
+        return 0;
+    });
+}
+
+async function signUp(user={username:username, email:email, password:password}){
+    let userObj = {}
+    await createUser(user.email, user.password, user.username)
+    .then(data=>{
+        userObj = data;
+        // console.log(data);
+    });
+    return userObj;
+}
+
+async function login(user={email:'', password:''}){
+   return await signIn(user.email, user.password);
+}
 
 // setting up the server
 let app = express();
 const PORT = 8090 || process.env.PORT;
 const users = [];
 
+const url = "mongodb+srv://Sthembiso:Stheshboi2C@cluster0.2hrhj.mongodb.net/TND?retryWrites=true&w=majority";
 
-app.listen(PORT, function(){
-    console.log('Listening on port'+PORT);
-});
+mongoose.connect(url, {useNewUrlParser:true, useUnifiedTopology:true})
+.then(res=>{
+    console.log('db connected')
+    app.listen(PORT, function(){
+        console.log('Listening on port'+PORT);
+    });
+}).catch(err=>{})
+
+
+
 app.use(express.text());
 app.use(express.urlencoded({extended:true}));
 
 app.post('/signin', (req, res)=>{ // register to the active users list
-
+    console.log('I run')
     if(JSON.parse(req.body)!= null){
         let resBody = JSON.parse(req.body);
         if(searchArray(users, resBody.username) == null){ // add them to the active users list
             let tempUser = new User(resBody.username,resBody.userEmail, resBody.userId);
             users.push(tempUser);
             res.end('Approved');
+            console.log("I'm in");
             return;
         }
     }  
@@ -177,7 +243,9 @@ app.post('/addFriend', (req, res)=>{
 
 app.post('/search', (req, res)=>{
     let searchData = JSON.parse(req.body);
+
     let userObj = searchArray(users, searchData.name);
+    console.log(userObj)
 
     if(userObj != null){
         let tempJSON = userObj.toJSON();
@@ -189,31 +257,72 @@ app.post('/search', (req, res)=>{
         res.end(JSON.stringify({length:0}));
         return;
     }
-})
+});
 
-
-function searchArray(arrayObject = [], key){
-    let tempObj = arrayObject[0];
-    if(arrayObject.length > 0){
-        if(tempObj.username === key){
-            return tempObj;
+app.post('/signup', (req, res)=>{
+    let userFormData = JSON.parse(req.body);
+    signUp(userFormData, res)
+    .then(user=>{
+        console.log('Evaluating response');
+        if(user.status == 'Firebase: Error (auth/email-already-in-use).'){
+            console.log(user)
+            res.write('Email already in use $');
+            res.end(JSON.stringify(user));
         }
-        else{ // binary search algorithm
-            
-            if(arrayObject.length > 1){
-                let middle = arrayObject[Math.floor(arrayObject.length/2)];
-    
-                if(middle.username === key)
-                    return middle;
-                else if(key > middle.username) // it means we should look from the second half
-                    return searchArray(arrayObject.slice(Math.floor(arrayObject.length/2+1), 
-                            arrayObject.length), key); // looking from the middle of the array
+        else if( user.status == 'Firebase: Error (auth/invalid-email).'){
+            console.log(user)
+            res.write('Invalid Email address$');
+            res.end(JSON.stringify(user));
+        }
+        else if(user.status === ''){
+            console.log('I run')
+            res.write('Sign Up Successful$');
+            res.end(JSON.stringify(user));
+            let tempUser = new User(user.username, user.email, user.id, []);
+            users.push(tempUser); // add the user to the local list
+            console.log(users);
+            let UserMod = new UserModel(tempUser.toJSON());
+            UserMod.save()
+            .then(()=>{
                 
-                else
-                    // search the second half
-                    return searchArray(arrayObject.slice(0, Math.floor(arrayObject.length/2)), key); 
-            }else 
-                return null;
+            }).catch(err=>{console.log(err)})
+            console.log(user)
+            // back up the user information in the database
         }
-    }
-}
+
+        console.log(user)
+    });
+});
+
+app.post('/login', (req, resp)=>{
+    let userFormData = JSON.parse(req.body);
+    
+    login(userFormData)
+    .then(res=>{
+        if(res.status == ''){ // the login was successful
+            resp.write('successful$');
+            resp.end(JSON.stringify({}));
+            console.log('Login Successful');
+            let userSearch = searchArray(users, res.username);
+            if(userSearch == null){
+                UserModel.findOne({email:userFormData.email})
+                .then((dbRes)=>{
+                    let tempUser = new User(dbRes.username, dbRes.email, dbRes._id, messages);
+                    tempUser.cachedUsersList.push(dbRes.friends);
+                    users.push(tempUser);
+                    console.log(users);
+                })
+                .catch(err=>{})
+            }
+            
+        }
+        else{
+            resp.write('failed$');
+            resp.end(JSON.stringify({}));
+            console.log('Login failed')
+        }
+    })
+    .catch(err=>{})
+    
+});
+
