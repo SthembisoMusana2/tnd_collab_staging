@@ -52,6 +52,17 @@ class User{
         
     }
 
+    friendsJSONToUserObjects(){
+        if(this.cachedUsersList.length > 0){
+            let tempFriendList = this.cachedUsersList[0];
+            for(let i=0; i<tempFriendList.length; i++){
+                let tUser = tempFriendList['friend'+i];
+                let tUserObj = new User(tUser.username, tUser.email, tUser._id, []);
+                this.appendFriendList(tUserObj);
+            }
+        }
+    }
+
     recentListJSON(){
         if(!this.isRecentEmpty()){
             let tempObj = {};
@@ -160,8 +171,6 @@ mongoose.connect(url, {useNewUrlParser:true, useUnifiedTopology:true})
     });
 }).catch(err=>{})
 
-
-
 app.use(express.text());
 app.use(express.urlencoded({extended:true}));
 
@@ -193,6 +202,11 @@ app.post('/send', (req, res)=>{
         let recipient  = messageRef.recipient;
         let user = searchArray(users, recipient, 'email');
         if( user != null){
+            let sender = searchArray(user.friendsList, messageRef.sEmail, 'email');
+            if(sender == null){
+                let senderO = searchArray(users, messageRef.sEmail, 'email');
+                user.appendFriendList(senderO);
+            }
             user.updateMessageList(messageRef);
             messageRef.status = 'sent'
             res.end(JSON.stringify(messageRef));
@@ -243,18 +257,25 @@ app.post('/poll', (req, res)=>{
 
 app.post('/addFriend', (req, res)=>{
     let user = JSON.parse(req.body);
-    let userObj = searchArray(users, user.searchString);
+    let userObj = searchArray(users, user.email, 'email');
+    let owner = searchArray(users, user.owner, 'email');
+    res.end();
+    
     if(userObj == null){
-        res.end(JSON.stringify({status:500}));
+    UserModel.findOne({email:user.email})
+        .then((dbRes)=>{
+            let tempUser = new User(dbRes.username, dbRes.email, dbRes._id, dbRes.messages);
+            tempUser.cachedUsersList.push(dbRes.friends);
+            tempUser.friendsJSONToUserObjects();
+            users.push(tempUser);
+            owner.appendFriendList(tempUser);
+            console.log('Friend added successfully')
+        })
+        .catch(err=>{console.log(err)})
         return;
     }
     else{
-        let friend = searchArray(users, user.username);
-        friend.appendFriendList(userObj);
-        let userJSON = userObj.toJSON();
-        userJSON.status = 0;
-        res.end(JSON.stringify(userJSON));
-        return;
+        owner.appendFriendList(userObj);
     }
 });
 
@@ -271,7 +292,6 @@ app.post('/search', (req, res)=>{
         return;
     }
     else{
-        console.log('User Online')
         UserModel.find({username:searchData.name})
         .then((dbRes)=>{
             if(dbRes.length > 0){
@@ -343,6 +363,7 @@ app.post('/login', (req, resp)=>{
                 .then((dbRes)=>{
                     let tempUser = new User(dbRes.username, dbRes.email, dbRes._id, dbRes.messages);
                     tempUser.cachedUsersList.push(dbRes.friends);
+                    tempUser.friendsJSONToUserObjects();
                     users.push(tempUser);
                     resp.end(JSON.stringify(tempUser.toJSON())); 
                 })
@@ -359,4 +380,3 @@ app.post('/login', (req, resp)=>{
     })
     .catch(err=>{})
 });
-

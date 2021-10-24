@@ -61,18 +61,27 @@ window.addEventListener('load', function(e){
                                 const addFriendButtons = document.getElementsByClassName('add-friend-button');
                                 for(let i=0; i<addFriendButtons.length; i++){
                                     addFriendButtons[i].addEventListener('click', function(e){
+
                                         let usersList = document.getElementsByClassName('friend-object');
                                         let thisUser = usersList[i];
                                         let userInfo = thisUser.innerText.split('\n');
                                         let userName = userInfo[0];
                                         let email = userInfo[1];
-                                        console.log(userName);
-                                        user.appendFriend(new User(userName.trim(), email, 0, []));
-                                        contactList.innerHTML = user.refreshFriendList();
-                                        overlay.style.display = 'none';
-                                        resultsContainer.innerHTML = '';
-                                        updateUserClick();
-            
+
+                                            fetch('http://127.0.0.1:8090/addFriend', {
+                                            method:'POST',
+                                            body:JSON.stringify({
+                                                email:email,
+                                                owner:user.useremail
+                                            })
+                                        })
+                                        .then((res)=>{
+                                            user.appendFriend(new User(userName.trim(), email, 0, []));
+                                            contactList.innerHTML = user.refreshFriendList();
+                                            overlay.style.display = 'none';
+                                            resultsContainer.innerHTML = '';
+                                            updateUserClick();
+                                        })                            
                                     });
                                 }
                             }
