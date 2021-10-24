@@ -10,7 +10,7 @@ class User{
         this.username = username;
         this.id = id;
         this.email = email;
-        this.historyList = historyList; // the message History
+        this.historyList = []// the message History
         this.currentUser = null; // the current friend you are talking to
         this.cachedUsersList = []; // a short list of recent friends you've been talking to
         this.recentMessages = []; // recent messages sent to you by others
@@ -94,10 +94,12 @@ class Group{
     }
 }
 
-function searchArray(arrayObject = [], key){
+function searchArray(arrayObject = [], key, scheme='username'){
+    // sort the array according to emails
+    sortArrayUsers(arrayObject, scheme); // sort the array first to how you want to search it
     let tempObj = arrayObject[0];
     if(arrayObject.length > 0){
-        if(tempObj.username === key){
+        if(tempObj[scheme] === key){
             return tempObj;
         }
         else{ // binary search algorithm
@@ -105,28 +107,29 @@ function searchArray(arrayObject = [], key){
             if(arrayObject.length > 1){
                 let middle = arrayObject[Math.floor(arrayObject.length/2)];
     
-                if(middle.username === key)
+                if(middle[scheme] === key)
                     return middle;
-                else if(key > middle.username) // it means we should look from the second half
+                else if(key > middle[scheme]) // it means we should look from the second half
                     return searchArray(arrayObject.slice(Math.floor(arrayObject.length/2+1), 
-                            arrayObject.length), key); // looking from the middle of the array
-                
+                            arrayObject.length), key, scheme); // looking from the middle of the array
                 else
                     // search the second half
-                    return searchArray(arrayObject.slice(0, Math.floor(arrayObject.length/2)), key); 
+                    return searchArray(arrayObject.slice(0, Math.floor(arrayObject.length/2)), key, scheme); 
             }else 
                 return null;
         }
     }
+    
 }
 
 function sortArrayUsers(array=[], scheme){
     array.sort((user1, user2)=>{
-        if(user1[scheme]> user2[scheme])return -1;
-        else if(user1[scheme] < user2[scheme])return 1;
+        if(user1[scheme]> user2[scheme])return 1;
+        else if(user1[scheme] < user2[scheme])return -1;
         return 0;
     });
 }
+
 
 async function signUp(user={username:username, email:email, password:password}){
     let userObj = {}
@@ -163,14 +166,12 @@ app.use(express.text());
 app.use(express.urlencoded({extended:true}));
 
 app.post('/signin', (req, res)=>{ // register to the active users list
-    console.log('I run')
     if(JSON.parse(req.body)!= null){
         let resBody = JSON.parse(req.body);
         if(searchArray(users, resBody.username) == null){ // add them to the active users list
             let tempUser = new User(resBody.username,resBody.userEmail, resBody.userId);
             users.push(tempUser);
             res.end('Approved');
-            console.log("I'm in");
             return;
         }
     }  
@@ -190,11 +191,27 @@ app.post('/send', (req, res)=>{
     // route message from one user to the next
     if(messageRef.recipientType === 'single'){
         let recipient  = messageRef.recipient;
-        let user = searchArray(users, recipient);
-        user.updateMessageList(messageRef);
-        messageRef.status = 'sent'
-        res.end(JSON.stringify(messageRef));
-        return;
+        let user = searchArray(users, recipient, 'email');
+        if( user != null){
+            user.updateMessageList(messageRef);
+            messageRef.status = 'sent'
+            res.end(JSON.stringify(messageRef));
+            return;
+        }else{
+            UserModel.findOne({email:recipient})
+            .then((dbRes)=>{
+                if(dbRes.length > 0){
+                    let tempUser = new User(dbRes.username, dbRes.email, dbRes._id, dbRes.messages, []);
+                    tempUser.cachedUsersList.push(dbRes.friends);
+                    users.push(tempUser);
+                    tempUser.updateMessageList(messageRef);
+                    messageRef.status = 'sent'
+                    res.end(JSON.stringify(messageRef));
+                } 
+            })
+            .catch(err=>{console.log(err)})
+        }
+        
     }
     else if(messageRef.recipientType === 'group'){
         let groupName = messageRef.group.name;
@@ -245,16 +262,35 @@ app.post('/search', (req, res)=>{
     let searchData = JSON.parse(req.body);
 
     let userObj = searchArray(users, searchData.name);
-    console.log(userObj)
 
     if(userObj != null){
-        let tempJSON = userObj.toJSON();
+        let tempJSON = {}
         tempJSON.length = 1;
+        tempJSON.user0 = userObj.toJSON();
         res.end(JSON.stringify(tempJSON));
         return;
     }
     else{
-        res.end(JSON.stringify({length:0}));
+        console.log('User Online')
+        UserModel.find({username:searchData.name})
+        .then((dbRes)=>{
+            if(dbRes.length > 0){
+                let tempJSON = {};
+                tempJSON['length'] = dbRes.length;
+                let j = 0;
+                for(let user of dbRes){
+                    tempJSON['user'+j] = user;
+                    j++;
+                }
+                res.end(JSON.stringify(tempJSON));
+            }
+            else{
+                res.end(JSON.stringify({length:0}));
+            }
+        })
+        .catch(err=>{
+            console.log(err);
+        })
         return;
     }
 });
@@ -296,33 +332,31 @@ app.post('/signup', (req, res)=>{
 
 app.post('/login', (req, resp)=>{
     let userFormData = JSON.parse(req.body);
-    
     login(userFormData)
-    .then(res=>{
+    .then(async res=>{
         if(res.status == ''){ // the login was successful
             resp.write('successful$');
-            resp.end(JSON.stringify({}));
-            console.log('Login Successful');
+            console.log('Login Successful')
             let userSearch = searchArray(users, res.username);
             if(userSearch == null){
-                UserModel.findOne({email:userFormData.email})
+                await UserModel.findOne({email:userFormData.email})
                 .then((dbRes)=>{
-                    let tempUser = new User(dbRes.username, dbRes.email, dbRes._id, messages);
+                    let tempUser = new User(dbRes.username, dbRes.email, dbRes._id, dbRes.messages);
                     tempUser.cachedUsersList.push(dbRes.friends);
                     users.push(tempUser);
-                    console.log(users);
+                    resp.end(JSON.stringify(tempUser.toJSON())); 
                 })
-                .catch(err=>{})
+                .catch(err=>{console.log(err)})
+            }else{
+                resp.end(JSON.stringify(userSearch.toJSON())); 
             }
-            
         }
         else{
             resp.write('failed$');
-            resp.end(JSON.stringify({}));
-            console.log('Login failed')
+            res.status = res.status.split(':')[1];
+            resp.end(JSON.stringify(res));
         }
     })
     .catch(err=>{})
-    
 });
 

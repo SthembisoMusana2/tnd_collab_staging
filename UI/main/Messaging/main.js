@@ -1,10 +1,11 @@
 
 class Message{
-    constructor(sender,recipientType, recipient, message, timestamp, sent=0, group={name:'', flag:false}, image = null){
+    constructor(sender,sEmail, recipientType, recipient, message, timestamp, sent=0, group={name:'', flag:false}, image = null){
         this.messagebody = message;
         this.timestamp = timestamp;
         this.messageImage = image;
         this.messageSender = sender;
+        this.senderEmail = sEmail;
         this.sent = sent;
         this.recipientType = recipientType;
         this.recipient = recipient;
@@ -21,6 +22,7 @@ class Message{
     toJSON(){
         return({
             sender:this.messageSender,
+            sEmail:this.senderEmail,
             recipientType:this.recipientType,
             recipient:this.recipient,
             messageBody:this.messagebody,
@@ -160,7 +162,7 @@ async function sendMessage(message){
 }
 
 async function signin(user={username:String, email:String, id:id}){
-    return fetch('http://127.0.0.1:8090/signin', {
+    return fetch('http://127.0.0.1:8090/login', {
         method:'POST',
         body:JSON.stringify(user)
     });
@@ -207,14 +209,18 @@ function signIn(){
     return new User(username, email, id, {});
 }
 
-function createMessageObject(message={sender:'', recipientType:this.recipientType,
+function login(userD){
+    
+}
+
+function createMessageObject(message={sender:'', sEmail:'', recipientType:'',
 recipient:'',
 messageBody:'',
 messageTime:'',
 sent:0,
 group:''}){
 
-    return new Message(message.sender, message.recipientType,message.recipient, message.messageBody, message.messageTime, 1, {});
+    return new Message(message.sender, message.sEmail, message.recipientType,message.recipient, message.messageBody, message.messageTime, 1, {});
 
 }
 
@@ -232,6 +238,7 @@ let currentFriend = null;
 
 let screenYOffset = 1;
 let groupMembersList = document.getElementById('group-members');
+let loginSuccess = false;
 
 window.addEventListener('load', function(e){
 
@@ -254,126 +261,166 @@ window.addEventListener('load', function(e){
         console.log(user);
     }
 
-    let colHeight = document.getElementsByClassName('body');
-    let screenWindow = document.getElementsByTagName('body');
-    let sendButton = document.getElementById('send');
-    
-    
-    let groupMembers = document.getElementById('group-members');
-    
-   
-    messageDisplayWind.style.height = this.innerHeight-this.innerHeight*0.2 + 'px';
-    screenWindow[0].style.maxHeight = this.window.innerHeight+'px';
-    screenWindow[0].style.overflowY = 'hidden';
-    colHeight[0].style.height = (window.innerHeight-screenYOffset)+"px";
-
-    signin(user.toJSON()).then(function(res){
-        res.text()
-        .then(data=>{
-            console.log(data);
-        });
+    signin(userDetails).then(function(res){
+       sessionStorage.setItem('loginStatus', 'true');
+    }).catch(err=>{
+        loginSuccess = false;
     });
 
-    start(user.toJSON()) // signing in to the message server
-    .then(res=>{
-        res.text().then(data=>{
-            let dataJson = JSON.parse(data);
+    loginSuccess = sessionStorage.getItem('loginStatus');
+    setTimeout(function(){
+        if(loginSuccess == 'true'){
 
-            if(dataJson.length > 0){
-                for(let j=0; j<dataJson.friends.length; j++){
-                    let tempUsers = dataJson.friends['friend '+j];
-                    user.appendFriend(new User(tempUsers.username,tempUsers.email, tempUsers.id, tempUsers.messages));
-                 }
-                 user.friendList.sort((user1, user2)=>{
-                     if(user1.username>user2.username)return 1;
-                     else if(user1.username<user2.username)return -1;
-                     return 0
-                 });
-     
-                 for(let i =0; i<user.friendList.length; i++) {
-                     contactList.innerHTML += user.friendList[i].toHtml();
-                 } 
-                updateUserClick();
-            }
+            const colHeight = document.getElementsByClassName('body');
+            const screenWindow = document.getElementsByTagName('body');
+            const sendButton = document.getElementById('send');
+            const groupMembers = document.getElementById('group-members');
+
+            messageDisplayWind.style.height = this.innerHeight-this.innerHeight*0.2 + 'px';
+            screenWindow[0].style.maxHeight = this.window.innerHeight+'px';
+            screenWindow[0].style.overflowY = 'hidden';
+            colHeight[0].style.height = (window.innerHeight-screenYOffset)+"px";
             
-        })
-        .catch(err=>console.log("There's an error: ", err));
-
-    });
-
-    if(currentFriend == null){
-        displayMessage.style.display = 'none';
-    }
-
-    sendButton.addEventListener('click', function(e){
-        let messageBody = messageField.value;
-        if(messageBody.length > 0){
-            let messageObject  = new Message(user.username, 'single', currentFriend.username, messageBody, Date(Date.now()));
-            messageDisplayWind.innerHTML += messageObject.toHtml();
-            messageField.value = '';
-            currentFriend.messageList.push(messageObject);
-            sendMessage(messageObject.toJSON())
+            start(user.toJSON()) // signing in to the message server
             .then(res=>{
-                // console.log(res);
-            });  
-        }
-        
-    });
+                res.text().then(data=>{
+                    let dataJson = JSON.parse(data);
 
-    messageField.addEventListener('keydown', function(e){
-        if(e.key == 'Enter'){
-            let messageBody = messageField.value;
-            if(messageBody.length > 0){
-                let messageObject  = new Message(user.username, 'single', currentFriend.username, messageBody, Date(Date.now()));
-                messageDisplayWind.innerHTML += messageObject.toHtml();
-                messageField.value = '';
-                currentFriend.messageList.push(messageObject);
-                sendMessage(messageObject.toJSON())
-                .then(res=>{
-                    res.text()
-                    .then(data=>{
-                        // let message = createMessageObject(JSON.parse(data));
-                        // currentFriend.messageList.push(message);
-                        // messageDisplayWind.innerHTML += message.toHtml();
-                    });
-                });
-            }
-        }
-    });
-
-    setInterval(function(){ // poll for new messages
-        poll(user.toJSON())
-        .then(function(res){
-            res.text()
-            .then(data=>{
-                let resJSON = JSON.parse(data);
-                let friend
-                if(resJSON.length > 0)
-                for(let i = 0; i<resJSON.length; i++){
-                    console.log(resJSON['message'+i].sender)
-                    friend = searchArray(user.friendList, resJSON['message'+i].sender);
-       
-                    if(friend == null && resJSON.length > 0){
-                        //add friend in the server...
-                        let tempFriend = new User(resJSON['message'+i].sender, 'default', 'defualt', [createMessageObject(resJSON['message'+i])]);
-                        contactList.innerHTML += tempFriend.toHtml();
-                        user.appendFriend(tempFriend);
-                        updateUserClick();
-                        console.log(friend)
-                    }
-                    else if(friend != null && resJSON.length > 0){
-                        friend.messageList.push(createMessageObject(resJSON['message'+i])); // add message to history
-                        if(friend === currentFriend){
-                            // update the screen..
-                            messageDisplayWind.innerHTML = currentFriend.messageListToHtml();
-                            // scroll down;
+                    if(dataJson.length > 0){
+                        for(let j=0; j<dataJson.friends.length; j++){
+                            let tempUsers = dataJson.friends['friend '+j];
+                            user.appendFriend(new User(tempUsers.username,tempUsers.email, tempUsers.id, tempUsers.messages));
                         }
+                        user.friendList.sort((user1, user2)=>{
+                            if(user1.username>user2.username)return 1;
+                            else if(user1.username<user2.username)return -1;
+                            return 0
+                        });
+            
+                        for(let i =0; i<user.friendList.length; i++) {
+                            contactList.innerHTML += user.friendList[i].toHtml();
+                        } 
+                        updateUserClick();
                     }
+                    
+                })
+                .catch(err=>console.log("There's an error: ", err));
+
+            });
+
+            if(currentFriend == null) displayMessage.style.display = 'none';
+
+            sendButton.addEventListener('click', function(e){
+                let messageBody = messageField.value;
+                if(messageBody.length > 0){
+                    let messageObject  = new Message(user.username,user.useremail, 'single', currentFriend.email, messageBody, Date(Date.now()));
+                    messageDisplayWind.innerHTML += messageObject.toHtml();
+                    messageField.value = '';
+                    currentFriend.messageList.push(messageObject);
+                    sendMessage(messageObject.toJSON())
+                    .then(res=>{
+                        // console.log(res);
+                    });  
                 }
                 
             });
-        });
+
+            messageField.addEventListener('keydown', function(e){
+                if(e.key == 'Enter'){
+                    let messageBody = messageField.value;
+                    if(messageBody.length > 0){
+                        console.log(currentFriend)
+                        let messageObject  = new Message(user.username,user.useremail, 'single', currentFriend.useremail, messageBody, Date(Date.now()));
+                        messageDisplayWind.innerHTML += messageObject.toHtml();
+                        messageField.value = '';
+                        currentFriend.messageList.push(messageObject);
+                        sendMessage(messageObject.toJSON())
+                        .then(res=>{
+                            res.text()
+                            .then(data=>{
+                                // let message = createMessageObject(JSON.parse(data));
+                                // currentFriend.messageList.push(message);
+                                // messageDisplayWind.innerHTML += message.toHtml();
+                            });
+                        });
+                    }
+                }
+            });
+
+            setInterval(function(){ // poll for new messages
+                poll(user.toJSON())
+                .then(function(res){
+                    res.text()
+                    .then(data=>{
+                        let resJSON = JSON.parse(data);
+                        let friend
+                        if(resJSON.length > 0)
+                        for(let i = 0; i<resJSON.length; i++){
+                            // console.log(resJSON['message'+i].sender)
+                            friend = searchArray(user.friendList, resJSON['message'+i].sender);
+            
+                            if(friend == null && resJSON.length > 0){
+                                //add friend in the server...
+                                let list = [];
+                                list.push(createMessageObject(resJSON['message'+i]));
+                                let tempFriend = new User(resJSON['message'+i].sender, resJSON['message'+i].sEmail, 'defualt', list);
+                                contactList.innerHTML += tempFriend.toHtml();
+                                user.appendFriend(tempFriend);
+                                updateUserClick();
+                                // console.log(friend)
+                            }
+                            else if(friend != null && resJSON.length > 0){
+                                friend.messageList.push(createMessageObject(resJSON['message'+i])); // add message to history
+                                if(friend === currentFriend){
+                                    // update the screen..
+                                    messageDisplayWind.innerHTML = currentFriend.messageListToHtml();
+                                    // scroll down;
+                                }
+                            }
+                        }
+                        
+                    });
+                });
+            }, 500);
+
+        }
+        else{
+            const bodyE = document.getElementsByTagName('body')[0];
+            bodyE.innerHTML = `<div class="retry container" style="width:70%; display:flex;justify-content:center;">
+                            <div class="retry-container"
+                            style="
+                                width:fit-content;
+                                padding:4%;
+                                margin-top:5%;
+                                display:flex;
+                                flex-flow:column;
+                                justify-content:center;
+                                box-shadow:7px 7px 20px 4px rgb(200, 200, 200), -7px -7px 20px 4px rgb(200, 200, 200);
+                                background: rgb(180, 180, 180);
+                                border-radius:2vh;
+                            ">
+                                <p style="font-family:roboto; "> Login Failed!!<br /></p>
+                                <div class="retry-button" style="
+                                        width:fit-content;
+                                        background-color:rgb(40,40,180);
+                                        margin-left:auto;
+                                        margin-right:auto;
+                                        border-radius:0.5em;
+                                        padding:5%;
+                                        box-shadow:2px 2px 10px 3px #7777, -2px -2px 10px 3px #7777;
+                                        ">
+                                    <a href='./messaging.html' style="color:white;
+                                        font-size:large;
+                                        font-weight:bold;
+                                        font-family:roboto;
+                                        ">Retry</a>
+                                </div>
+                                </div></div>`
+            
+        }
+
     }, 500);
+    
 });
 
 window.addEventListener('resize', function(){

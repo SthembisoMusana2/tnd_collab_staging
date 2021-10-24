@@ -9,6 +9,7 @@ addEventListener('load', function(e){
     const signUpForm = document.getElementById('signup-form');
     const spinner = document.getElementsByClassName('spinner')[0];
     const spinner2 = document.getElementsByClassName('spinner')[1];
+    const spinnerContainer = document.getElementsByClassName('spinner-cont')[0];
 
     loginLink.addEventListener('click', function(e){
         e.preventDefault();
@@ -25,6 +26,9 @@ addEventListener('load', function(e){
     loginForm.addEventListener('submit', function(e){
         e.preventDefault();
 
+        spinnerContainer.innerHTML = `<div class="spinner verticalCenter center">
+                                    </div>`
+        const spinner2 = document.getElementsByClassName('spinner')[1];
         spinner2.style.visibility = 'visible';
         
 
@@ -42,9 +46,11 @@ addEventListener('load', function(e){
             .then(data=>{
                 spinner2.style.visibility = 'hidden';
                 resp = data.split('$')
+                console.log(resp)
                 if(resp[0] == 'successful'){
                     //redirect to the user space...
-                    let userObj = {username:'sthe', email:email, id:'nothing'}//JSON.parse(resp[1]);
+                    let userObj = JSON.parse(resp[1]);//JSON.parse(resp[1]);
+                    console.log(resp[1])
                     localStorage.setItem('username', userObj.username);
                     localStorage.setItem('email', userObj.email);
                     localStorage.setItem('id', userObj.id);
@@ -55,6 +61,13 @@ addEventListener('load', function(e){
                     path.push('messaging.html');
                     path = path.join('/');
                     window.location.pathname = path; 
+                }
+                else{
+                    spinnerContainer.innerHTML = `<div class="verticalCenter center">
+                                                <p style="text-align:center;color:red;font-family:roboto;font-size:large; ">
+                                                    Login Failed ... please try again!
+                                                    </p>
+                                                </div>`
                 }
             });
         });
@@ -81,7 +94,7 @@ addEventListener('load', function(e){
             resp.text()
             .then(data=>{
                 spinner.style.visibility = 'hidden';
-                resp = data.split('$')
+                resp = data.split('$');
                 if(resp[0] == 'Sign Up Successful'){
                     //redirect to the user space...
                     let userObj = JSON.parse(resp[1]);
@@ -90,6 +103,7 @@ addEventListener('load', function(e){
                     localStorage.setItem('id', userObj.id);
                     localStorage.setItem('password', tempObj.password);
 
+                    
                     let path = window.location.pathname.split('/');
                     path.pop();
                     path.push('messaging.html');

@@ -53,25 +53,28 @@ window.addEventListener('load', function(e){
                     res.text()
                     .then(data=>{
                         result = JSON.parse(data);
+                        resultsContainer.innerHTML = '';
                         if(result.length > 0){
-                            result = JSON.parse(data);
-                            resultsContainer.innerHTML = resultTemplate(result);
-                            const addFriendButtons = document.getElementsByClassName('add-friend-button');
-                            for(let i=0; i<addFriendButtons.length; i++){
-                                addFriendButtons[i].addEventListener('click', function(e){
-                                    let usersList = document.getElementsByClassName('friend-object');
-                                    let thisUser = usersList[i];
-                                    let userInfo = thisUser.innerText.split('\n');
-                                    let userName = userInfo[0];
-                                    let email = userInfo[1];
-                                    console.log(userName);
-                                    user.appendFriend(new User(userName.trim(), email, 0, []));
-                                    contactList.innerHTML = user.refreshFriendList();
-                                    overlay.style.display = 'none';
-                                    resultsContainer.innerHTML = '';
-                                    updateUserClick();
-        
-                                });
+                            for(let i=0; i<result.length;  i++){
+                                let friend  = result['user'+i];
+                                resultsContainer.innerHTML += resultTemplate(friend);
+                                const addFriendButtons = document.getElementsByClassName('add-friend-button');
+                                for(let i=0; i<addFriendButtons.length; i++){
+                                    addFriendButtons[i].addEventListener('click', function(e){
+                                        let usersList = document.getElementsByClassName('friend-object');
+                                        let thisUser = usersList[i];
+                                        let userInfo = thisUser.innerText.split('\n');
+                                        let userName = userInfo[0];
+                                        let email = userInfo[1];
+                                        console.log(userName);
+                                        user.appendFriend(new User(userName.trim(), email, 0, []));
+                                        contactList.innerHTML = user.refreshFriendList();
+                                        overlay.style.display = 'none';
+                                        resultsContainer.innerHTML = '';
+                                        updateUserClick();
+            
+                                    });
+                                }
                             }
                         }
                         else{
@@ -97,25 +100,29 @@ window.addEventListener('load', function(e){
                 res.text()
                 .then(data=>{
                     result = JSON.parse(data);
+                    resultsContainer.innerHTML = '';
                     if(result.length > 0){
-                        result = JSON.parse(data);
-                        resultsContainer.innerHTML = resultTemplate(result);
-                        const addFriendButtons = document.getElementsByClassName('add-friend-button');
-                        for(let i=0; i<addFriendButtons.length; i++){
-                            addFriendButtons[i].addEventListener('click', function(e){
-                                let usersList = document.getElementsByClassName('friend-object');
-                                let thisUser = usersList[i];
-                                let userInfo = thisUser.innerText.split('\n');
-                                let userName = userInfo[0];
-                                let email = userInfo[1];
-                                console.log(userName);
-                                user.appendFriend(new User(userName.trim(), email, 0, []));
-                                contactList.innerHTML = user.refreshFriendList();
-                                overlay.style.display = 'none';
-                                resultsContainer.innerHTML = '';
-                                updateUserClick();
-    
-                            });
+                        for(let i=0; i<result.length;  i++){
+                            let friend  = result['user'+i];
+                            console.log(friend);
+                            resultsContainer.innerHTML += resultTemplate(friend);
+                            const addFriendButtons = document.getElementsByClassName('add-friend-button');
+                            for(let i=0; i<addFriendButtons.length; i++){
+                                addFriendButtons[i].addEventListener('click', function(e){
+                                    let usersList = document.getElementsByClassName('friend-object');
+                                    let thisUser = usersList[i];
+                                    let userInfo = thisUser.innerText.split('\n');
+                                    let userName = userInfo[0];
+                                    let email = userInfo[1];
+                                    console.log(userName);
+                                    user.appendFriend(new User(userName.trim(), email, 0, []));
+                                    contactList.innerHTML = user.refreshFriendList();
+                                    overlay.style.display = 'none';
+                                    resultsContainer.innerHTML = '';
+                                    updateUserClick();
+        
+                                });
+                            }
                         }
                     }
                     else{
