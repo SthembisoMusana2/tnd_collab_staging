@@ -238,7 +238,8 @@ window.addEventListener('load', function(e){
     let userDetails = { 
         username:localStorage.getItem('username'), 
         email:localStorage.getItem('email'), 
-        id:localStorage.getItem('id')
+        id:localStorage.getItem('id'),
+        password:localStorage.getItem('password')
     };
 
     if(userDetails.username == null){

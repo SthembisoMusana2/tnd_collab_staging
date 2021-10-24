@@ -1,0 +1,33 @@
+.spinner{
+    width: 3em;
+    height: 3em;
+    animation-name: spin;
+    animation-duration: 0.7s;
+    border-left: 2px solid blue;
+    border-bottom: 2px solid blue;
+    border-radius: 2em;
+    transform: rotate(0.5turn);
+    animation-iteration-count: infinite;
+    visibility: hidden;
+}
+
+
+@keyframes spin{
+    0%{transform: rotate(0.0turn); border-color: chartreuse;}
+    10%{transform: rotate(0.1turn); border-color: rgb(255, 81, 0);}
+    20%{transform: rotate(0.2turn); border-color: rgb(209, 117, 181);}
+    25%{transform: rotate(0.25turn);border-color: rgb(224, 222, 231);}
+    50%{transform: rotate(0.5turn);border-color: rgb(133, 223, 43);}
+    75%{transform: rotate(0.75turn); border-color: rgb(0, 38, 255);}
+    100%{transform: rotate(1turn); border-color: rgb(139, 48, 112);}
+
+}
+
+.center{
+    margin:auto;
+}
+
+.verticalCenter{
+    position: relative;
+    top: 18vh;
+}

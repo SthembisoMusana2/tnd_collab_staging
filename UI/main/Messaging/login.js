@@ -6,10 +6,11 @@ addEventListener('load', function(e){
     let signup = document.getElementById('signup');
     let signupLink = this.document.getElementById('signup-link');
     const loginForm = document.getElementById('login-form');
-    const signUpForm = document.getElementById('signup-form')
+    const signUpForm = document.getElementById('signup-form');
+    const spinner = document.getElementsByClassName('spinner')[0];
+    const spinner2 = document.getElementsByClassName('spinner')[1];
 
     loginLink.addEventListener('click', function(e){
-        // alert('click')
         e.preventDefault();
         login.style.display = 'none';
         signup.style.display = 'block';
@@ -24,6 +25,9 @@ addEventListener('load', function(e){
     loginForm.addEventListener('submit', function(e){
         e.preventDefault();
 
+        spinner2.style.visibility = 'visible';
+        
+
         const formData = new FormData(e.target);
         const email = formData.get('email');
         const password = formData.get('password');
@@ -36,6 +40,7 @@ addEventListener('load', function(e){
         }).then(resp=>{
             resp.text()
             .then(data=>{
+                spinner2.style.visibility = 'hidden';
                 resp = data.split('$')
                 if(resp[0] == 'successful'){
                     //redirect to the user space...
@@ -43,12 +48,13 @@ addEventListener('load', function(e){
                     localStorage.setItem('username', userObj.username);
                     localStorage.setItem('email', userObj.email);
                     localStorage.setItem('id', userObj.id);
+                    localStorage.setItem('password', tempObj.password);
 
                     let path = window.location.pathname.split('/');
                     path.pop();
                     path.push('messaging.html');
                     path = path.join('/');
-                    window.location.pathname = path;
+                    window.location.pathname = path; 
                 }
             });
         });
@@ -57,6 +63,9 @@ addEventListener('load', function(e){
 
     signUpForm.addEventListener('submit', function(e){
         e.preventDefault();
+        spinner.style.visibility = 'visible';
+
+        console.log(spinner);
         const formData = new FormData(e.target);
         const username = formData.get('username');
         const password = formData.get('password');
@@ -71,6 +80,7 @@ addEventListener('load', function(e){
         }).then(resp=>{
             resp.text()
             .then(data=>{
+                spinner.style.visibility = 'hidden';
                 resp = data.split('$')
                 if(resp[0] == 'Sign Up Successful'){
                     //redirect to the user space...
@@ -78,6 +88,7 @@ addEventListener('load', function(e){
                     localStorage.setItem('username', userObj.username);
                     localStorage.setItem('email', userObj.email);
                     localStorage.setItem('id', userObj.id);
+                    localStorage.setItem('password', tempObj.password);
 
                     let path = window.location.pathname.split('/');
                     path.pop();

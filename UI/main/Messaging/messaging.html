@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="./messageDisplay.css" />
     <link rel="stylesheet" href="./profileView.css"  />
     <link rel="stylesheet" href="./search.css" />
+    <link rel="stylesheet" href="./spinner.css"
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <title>Messaging</title>
 </head>
@@ -19,6 +20,7 @@
         <div class="close-overlay">
             <span id ="close-overlay-t" style="color: white; font-size:xx-large; padding-left: 2%;">X</span>
         </div>
+        <!-- <div class="spinner"></div> -->
         <div class="search-user container">
             <h5 class="search-title">Search </h5>
             <div class="search-field">
@@ -26,7 +28,9 @@
                 <input type="button" value="Go" class="browser-default search-button" id="search-button" />
             </div>
             <h6 id="results-heading">Results ...</h6>
-            <div class="search-results"></div>
+            <div class="search-results">
+                <div class="spinner center"></div><br/>
+            </div>
         </div>
     </div>
     <div class="body row" id="body">

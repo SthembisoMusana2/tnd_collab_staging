@@ -6,10 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link rel="stylesheet" href="./signup.css" />
+    <link rel="stylesheet" href="./spinner.css">
     <title>SignUp</title>
 </head>
 <body class="container">
     <div class="signup" id='signup'>
+        <div class="spinner center verticalCenter"></div>
         <div class='signup-form container'>
             <form class='form' id ='signup-form' autocomplete="off">
                 <input name ='username' placeholder="username" type="text" class="browser-default field field1" required/><br />
@@ -25,7 +27,8 @@
     </div>
 
 
-    <div id="login">
+    <div id="login" class="container">
+        <div class="spinner center verticalCenter"></div>
         <div class='signup-form container'>
             <form class='form' id='login-form' autocomplete="off">
                 <input name = "email" placeholder="email" type="text" class="browser-default field field1" required/><br />
