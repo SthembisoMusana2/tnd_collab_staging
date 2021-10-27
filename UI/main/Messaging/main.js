@@ -1,9 +1,9 @@
 
 class Message{
-    constructor(sender,sEmail, recipientType, recipient, message, timestamp, sent=0, group={name:'', flag:false}, image = null){
+    constructor(sender,sEmail, recipientType, recipient, message, timestamp, imgR, sent=0, group={name:'', flag:false}){
         this.messagebody = message;
         this.timestamp = timestamp;
-        this.messageImage = image;
+        this.messageImage = imgR;
         this.messageSender = sender;
         this.senderEmail = sEmail;
         this.sent = sent;
@@ -32,7 +32,6 @@ class Message{
     }
 
     toHtml(){
-        this.messageImage ="../messaging-icon.png";
         let timeVar = this.timestamp.split(' ')[4].split(':');
         timeVar.pop()
         timeVar[0] += ':'
@@ -67,13 +66,13 @@ class Message{
 }
 
 class User{
-    constructor(username, email, id, messageList=[]){
+    constructor(username, email, id, imgR="../TND-Logo_-Unpacked-Parts.png", messageList=[]){
         this.username= username;
         this.useremail = email;
         this.id = id;
         this.messageList = [];
         this.friendList = [];
-        this.profileImage = '';
+        this.profileImage = imgR;
         this.latestMessage = messageList!==null?messageList[messageList.length-1]:null;
     }
 
@@ -95,12 +94,12 @@ class User{
         return({
             username:this.username,
             email:this.useremail,
-            id:this.id
+            id:this.id,
+            avatar:this.profileImage
         });
     }
 
     toHtml(){
-        this.profileImage = `../TND-Logo_-Unpacked-Parts.png`;
         // this.latestMessage != null?this.latestMessage.getMessagebody():'hello friend..';
         return(
             `<div class="user" id=${this.useremail}>
@@ -184,6 +183,7 @@ async function start(user={username:null, email:null, id:id}){
 
 const userNameInfo = document.getElementsByClassName('group-name')[0];
 const userEmailInfo = document.getElementsByClassName('group-description')[0];
+const friendProfilePhoto = document.getElementById('friend-profile');
 
 function updateUserClick(){
     let usersHtml = document.getElementsByClassName('user');
@@ -195,6 +195,7 @@ function updateUserClick(){
             if(currentFriend != null){
                 displayMessage.style.display = 'block';
                 profileTitle.innerText = currentFriend.username;
+                friendProfilePhoto.setAttribute('src', currentFriend.profileImage);
                 messageDisplayWind.innerHTML = '';
                 messageDisplayWind.innerHTML = currentFriend.messageListToHtml();
             }
@@ -207,8 +208,8 @@ function createMessageObject(message={sender:'', sEmail:'', recipientType:'',
     messageBody:'',
     messageTime:'',
     sent:0,
-    group:''}){
-    return new Message(message.sender, message.sEmail, message.recipientType,message.recipient, message.messageBody, message.messageTime, 1, {});
+    group:''}, imgR){
+    return new Message(message.sender, message.sEmail, message.recipientType,message.recipient, message.messageBody, message.messageTime, imgR, 1, {});
 }
 
 const Users = [];
@@ -218,6 +219,8 @@ const messageDisplayWind = document.getElementById("message-display");
 const messageField = document.getElementById('message-field');
 const displayMessage = document.getElementsByClassName('display-content')[0];
 const groupMembersList = document.getElementById('group-members');
+const profileImage = document.getElementsByClassName('profile-picture')[0];
+const profileView = document.getElementById('profile-view');
 
 let user;
 let currentFriend = null;
@@ -230,7 +233,8 @@ window.addEventListener('load', function(e){
         username:localStorage.getItem('username'), 
         email:localStorage.getItem('email'), 
         id:localStorage.getItem('id'),
-        password:localStorage.getItem('password')
+        password:localStorage.getItem('password'),
+        img:localStorage.getItem('avatar')
     };
 
     if(userDetails.username == null){
@@ -242,9 +246,11 @@ window.addEventListener('load', function(e){
         window.location.pathname = path;
     }
     else{
-        user = new User(userDetails.username, userDetails.email, userDetails.id, []);
-        userNameInfo.innerText =' Name: '+user.username;
-        userEmailInfo.innerText = ' Email: '+user.useremail;
+        user = new User(userDetails.username, userDetails.email, userDetails.id, userDetails.img, []);
+        userNameInfo.innerText =`${user.username}`;
+        userEmailInfo.innerHTML = `<p><a href='maitlto:'+${user.useremail} > ${user.useremail}</a></p>`
+        profileImage.setAttribute('src', userDetails.img);
+        profileView.setAttribute('src', userDetails.img);
     }
 
     signin(userDetails).then(function(res){
@@ -257,7 +263,7 @@ window.addEventListener('load', function(e){
            if(friends.length > 0){
                for(let i=0; i<friends.length; i++){
                     let temp = friends['friend '+i];
-                    let tempUser = new User(temp.username, temp.email, temp.email);
+                    let tempUser = new User(temp.username, temp.email, temp.email, temp.avatar, []);
                     user.appendFriend(tempUser);
                }
                user.friendList.sort((user1, user2)=>{
@@ -295,7 +301,7 @@ window.addEventListener('load', function(e){
             sendButton.addEventListener('click', function(e){
                 let messageBody = messageField.value;
                 if(messageBody.length > 0){
-                    let messageObject  = new Message(user.username,user.useremail, 'single', currentFriend.email, messageBody, Date(Date.now()));
+                    let messageObject  = new Message(user.username,user.useremail, 'single', currentFriend.email, messageBody, Date(Date.now()), user.profileImage);
                     messageDisplayWind.innerHTML += messageObject.toHtml();
                     messageField.value = '';
                     currentFriend.messageList.push(messageObject);
@@ -311,7 +317,7 @@ window.addEventListener('load', function(e){
                 if(e.key == 'Enter'){
                     let messageBody = messageField.value;
                     if(messageBody.length > 0){
-                        let messageObject  = new Message(user.username,user.useremail, 'single', currentFriend.useremail, messageBody, Date(Date.now()));
+                        let messageObject  = new Message(user.username,user.useremail, 'single', currentFriend.useremail, messageBody, Date(Date.now()), user.profileImage);
                         messageDisplayWind.innerHTML += messageObject.toHtml();
                         messageField.value = '';
                         currentFriend.messageList.push(messageObject);
@@ -346,7 +352,7 @@ window.addEventListener('load', function(e){
                                 // console.log(friend)
                             }
                             else if(friend != null && resJSON.length > 0){
-                                friend.messageList.push(createMessageObject(resJSON['message'+i])); // add message to history
+                                friend.messageList.push(createMessageObject(resJSON['message'+i], friend.profileImage)); // add message to history
                                 if(friend === currentFriend){
                                     // update the screen..
                                     messageDisplayWind.innerHTML = currentFriend.messageListToHtml();

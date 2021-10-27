@@ -10,8 +10,14 @@
     <link rel="stylesheet" href="./messageDisplay.css" />
     <link rel="stylesheet" href="./profileView.css"  />
     <link rel="stylesheet" href="./search.css" />
-    <link rel="stylesheet" href="./spinner.css"
+    <link rel="stylesheet" href="./spinner.css" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Firebase config for cloud storage -->
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+    <!-- Firebase services I need to use -->
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-storage.js"></script>
+
     <title>Messaging</title>
 </head>
 <body>
@@ -57,7 +63,7 @@
             <div class="display-content">
                 <div class="user-profile">
                     <div class ="user-profile-image circle">
-                        <img src="../messaging-icon.png" class="responsive-img circle profile-picture" alt="Profile">
+                        <img src="../messaging-icon.png" id="friend-profile" class="responsive-img circle profile-picture" alt="Profile">
                     </div>
     
                     <div class="title">
@@ -66,10 +72,9 @@
                     <!-- <div class="more" id="more-display-menu"></div> -->
                 </div>
                 <!-- Middle -->
-                <div class="message-display" id = "message-display">
-                </div>
-    
+                <div class="message-display " id = "message-display"></div>
                 <!-- Bottom -->
+
                 <div class="edit-bar">
                     <div class="edit-coll">
                        
@@ -105,7 +110,7 @@
         <div class="chat-info col s6 no-padding">
             <div class="profile-view-img-section">
                 <div class="profile-view-img circle">
-                    <img src="../TND-Logo_-Unpacked-Parts.png" class="responsive-img circle" alt="Profile View Image" />
+                    <img src="../TND-Logo_-Unpacked-Parts.svg" class="responsive-img circle" id = "profile-view" alt="Profile View Image" />
                 </div>
                 <!-- <hr > -->
             </div>
@@ -113,8 +118,8 @@
             <div class="profile-view-group-info">
                 <h5 class="info-title">Profile Info</h5>
                 <hr />
-                <p class="group-name">Name:</p>
-                <p class="group-description">Email:</p>
+                <p class="group-name"></p>
+                <p class="group-description"></p>
                 <div class="group-members" id="group-members">
                    
                 </div>

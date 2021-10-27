@@ -7,9 +7,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link rel="stylesheet" href="./signup.css" />
     <link rel="stylesheet" href="./spinner.css" />
+
+    <!-- Firebase config for cloud storage -->
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+    <!-- Firebase services I need to use -->
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-storage.js"></script>
+
     <title>Login</title>
 </head>
+
 <body class="container">
+    <div class="overlay">
+        <div class="avatar-overlay">
+            <div class="text">
+                <p class="heading-text">Select Avatar for your Acount</p>
+            </div>
+            
+            <hr />
+            <div class="img-container">
+            </div>
+            <div class="next-b" id="next-b"><span>Next</span></div>
+        </div>
+    </div>
+
     <div class="signup" id='signup'>
         <div class="spinner center verticalCenter"></div>
         <div class='signup-form container'>
@@ -49,5 +69,8 @@
 
 </body>
 
+<script src="./firebase.js"></script>
 <script src="./login.js"></script>
+<script src="./avatar.js"></script>
+
 </html>

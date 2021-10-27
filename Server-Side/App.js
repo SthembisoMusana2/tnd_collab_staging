@@ -4,12 +4,12 @@ const {signIn, createUser, usersList} = require('./signupLogin');
 const mongoose = require('mongoose');
 const UserModel = require('./UserSchema');
 
-
 class User{
-    constructor(username, email, id, historyList = []){
+    constructor(username, email, id, imgR, historyList = []){
         this.username = username;
         this.id = id;
         this.email = email;
+        this.imgUrl = imgR;
         this.historyList = []// the message History
         this.currentUser = null; // the current friend you are talking to
         this.cachedUsersList = []; // a short list of recent friends you've been talking to
@@ -80,6 +80,7 @@ class User{
             username:this.username,
             email:this.email,
             id:this.id,
+            avatar:this.imgUrl,
             userId:this.id,
             messages:this.recentListJSON(),
             friends:this.friendListToJSON()
@@ -105,7 +106,6 @@ class Group{
         }
     }
 }
-
 
 function searchArray(arrayObject = [], key, scheme='username'){
     // sort the array according to emails
@@ -142,7 +142,6 @@ function sortArrayUsers(array=[], scheme){
         return 0;
     });
 }
-
 
 async function signUp(user={username:username, email:email, password:password}){
     let userObj = {}
@@ -260,7 +259,7 @@ app.post('/addFriend', (req, res)=>{
     let userObj = searchArray(users, user.email, 'email');
     let owner = searchArray(users, user.owner, 'email');
     res.end();
-    console.log('Adding friend to save...');
+
     if(userObj == null){
         UserModel.findOne({email:user.email})
             .then((dbRes)=>{
@@ -270,7 +269,6 @@ app.post('/addFriend', (req, res)=>{
                 users.push(tempUser);
                 let test = searchArray(owner.friendsList, user.email, 'email');
                 if(test == null) owner.appendFriendList(tempUser);
-                console.log(test);
             })
             .catch(err=>{console.log(err)})
     }
@@ -280,12 +278,8 @@ app.post('/addFriend', (req, res)=>{
     }
 
     UserModel.findOneAndReplace(owner.id, owner.toJSON())
-    .then(res=>{
-        console.log('Saved Successfully:\n', res);
-    })
-    .catch(err=>{
-        console.log(err);
-    });
+    .then(res=>{})
+    .catch(err=>{console.log(err);});
 });
 
 app.post('/search', (req, res)=>{
@@ -326,34 +320,26 @@ app.post('/signup', (req, res)=>{
     let userFormData = JSON.parse(req.body);
     signUp(userFormData, res)
     .then(user=>{
-        console.log('Evaluating response');
         if(user.status == 'Firebase: Error (auth/email-already-in-use).'){
-            // console.log(user)
             res.write('Email already in use $');
             res.end(JSON.stringify(user));
         }
         else if( user.status == 'Firebase: Error (auth/invalid-email).'){
-            // console.log(user)
             res.write('Invalid Email address$');
             res.end(JSON.stringify(user));
         }
         else if(user.status === ''){
-            // console.log('I run')
+            // back up the user information in the database
             res.write('Sign Up Successful$');
             res.end(JSON.stringify(user));
-            let tempUser = new User(user.username, user.email, user.id, []);
+            let tempUser = new User(user.username, user.email, user.id, userFormData.avatar, []);
+            console.log(tempUser);
             users.push(tempUser); // add the user to the local list
-            // console.log(users);
             let UserMod = new UserModel(tempUser.toJSON());
             UserMod.save()
-            .then(()=>{
-                
-            }).catch(err=>{console.log(err)})
-            // console.log(user)
-            // back up the user information in the database
+            .then(()=>{})
+            .catch(err=>{console.log(err)})
         }
-
-        console.log(user)
     });
 });
 
@@ -367,7 +353,7 @@ app.post('/login', (req, resp)=>{
             if(userSearch == null){
                 await UserModel.findOne({email:userFormData.email})
                 .then((dbRes)=>{
-                    let tempUser = new User(dbRes.username, dbRes.email, dbRes._id, dbRes.messages);
+                    let tempUser = new User(dbRes.username, dbRes.email, dbRes._id, dbRes.avatar, dbRes.messages);
                     tempUser.cachedUsersList.push(dbRes.friends);
                     tempUser.friendsJSONToUserObjects();
                     users.push(tempUser);
@@ -384,6 +370,5 @@ app.post('/login', (req, resp)=>{
             resp.end(JSON.stringify(res));
         }
     })
-    .catch(err=>{})
-    console.log('Login Successful')
+    .catch(err=>{});
 });

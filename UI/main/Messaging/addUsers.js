@@ -5,10 +5,10 @@ const addUserButton = document.getElementById('add-user');
 const searchField = document.getElementById('search-string');
 const searchButton = document.getElementById('search-button');
 
-function resultTemplate(user={username:'', email:'', id:0}){
+function resultTemplate(user={username:'', email:'', id:0, avatar:''}){
     return(
         ` <div class="friend-object">
-        <img src="../TND-Logo_-Unpacked-Parts-VC.svg" alt="user-avatar" class="responsive-img circle result-avatar"/>
+        <img src=${user.avatar} alt="user-avatar" class="responsive-img circle result-avatar"/>
         <div class="user-information">
             <span class="result-username">${user.username}</span>
             <span class="result-email">${user.email} </span>
@@ -75,7 +75,7 @@ window.addEventListener('load', function(e){
                                                     })
                                                 })
                                                 .then((res)=>{
-                                                    user.appendFriend(new User(userName.trim(), email, email, []));
+                                                    user.appendFriend(new User(userName.trim(), email, email, friend.avatar, []));
                                                     contactList.innerHTML = user.refreshFriendList();
                                                     overlay.style.display = 'none';
                                                     resultsContainer.innerHTML = '';
@@ -142,7 +142,7 @@ window.addEventListener('load', function(e){
                                                 })
                                             })
                                             .then((res)=>{
-                                                user.appendFriend(new User(userName.trim(), email, email, []));
+                                                user.appendFriend(new User(userName.trim(), email, email, friend.avatar, []));
                                                 contactList.innerHTML = user.refreshFriendList();
                                                 overlay.style.display = 'none';
                                                 resultsContainer.innerHTML = '';

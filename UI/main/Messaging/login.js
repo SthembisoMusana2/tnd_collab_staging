@@ -14,7 +14,12 @@ addEventListener('load', function(e){
     loginLink.addEventListener('click', function(e){
         e.preventDefault();
         login.style.display = 'none';
-        signup.style.display = 'block';
+        
+        let avatarUrl = localStorage.getItem('avatar');
+        if(avatarUrl == null){
+            const overlay = document.getElementsByClassName('overlay')[0];
+            overlay.style.display = 'flex';
+        }
     });
 
     signupLink.addEventListener('click', function(e){
@@ -78,14 +83,13 @@ addEventListener('load', function(e){
         e.preventDefault();
         spinner.style.visibility = 'visible';
 
-        console.log(spinner);
+
         const formData = new FormData(e.target);
         const username = formData.get('username');
         const password = formData.get('password');
         const email = formData.get('email');
 
-        let tempObj = {username:username, email:email, password:password};
-
+        let tempObj = {username:username, email:email, password:password, avatar:localStorage.getItem('avatar')};
 
         fetch('http://127.0.0.1:8090/signup', {
             method:'POST',
@@ -102,7 +106,6 @@ addEventListener('load', function(e){
                     localStorage.setItem('email', userObj.email);
                     localStorage.setItem('id', userObj.id);
                     localStorage.setItem('password', tempObj.password);
-
                     
                     let path = window.location.pathname.split('/');
                     path.pop();
@@ -110,6 +113,12 @@ addEventListener('load', function(e){
                     path = path.join('/');
                     window.location.pathname = path;
                 }
+                else{
+                    alert(resp[0]);
+                }
+            })
+            .catch(err=>{
+
             });
         });
         // send the data to Firebase and await response ...

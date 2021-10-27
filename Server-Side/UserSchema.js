@@ -21,6 +21,9 @@ let UserSchema = new Schema({
     messages:{
         type:{},
         // required:true
+    },
+    avatar:{
+        type:String
     }
 }, {timestamps:true});
 
