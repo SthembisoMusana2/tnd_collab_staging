@@ -102,7 +102,7 @@ class User{
     toHtml(){
         this.profileImage = `../TND-Logo_-Unpacked-Parts.png`;
         return(
-            `<div class="user">
+            `<div class="user" id=${this.useremail}>
                     <div class ="profile-image circle">
                         <img src=${this.profileImage} class="responsive-img circle profile-picture" alt="Profile">
                     </div>
@@ -256,18 +256,42 @@ window.addEventListener('load', function(e){
         path.push('signup.html');
         path = path.join('/');
         window.location.pathname = path;
-    }else{
+    }
+    else{
         user = new User(userDetails.username, userDetails.email, userDetails.id, []);
-        console.log(user);
     }
 
     signin(userDetails).then(function(res){
        sessionStorage.setItem('loginStatus', 'true');
+       res.text()
+       .then(data=>{
+           let respData = data.split('$');
+           let userData = JSON.parse(respData[1]);
+           let friends = userData['friends'];
+           if(friends.length > 0){
+               for(let i=0; i<friends.length; i++){
+                    let temp = friends['friend '+i];
+                    let tempUser = new User(temp.username, temp.email, temp.email);
+                    user.appendFriend(tempUser);
+               }
+
+               user.friendList.sort((user1, user2)=>{
+                if(user1.username>user2.username)return 1;
+                else if(user1.username<user2.username)return -1;
+                return 0});
+
+            for(let i =0; i<user.friendList.length; i++) {
+                contactList.innerHTML += user.friendList[i].toHtml();
+            } 
+            updateUserClick();
+           }
+       })
     }).catch(err=>{
         loginSuccess = false;
     });
 
     loginSuccess = sessionStorage.getItem('loginStatus');
+
     setTimeout(function(){
         if(loginSuccess == 'true'){
 
@@ -281,32 +305,32 @@ window.addEventListener('load', function(e){
             screenWindow[0].style.overflowY = 'hidden';
             colHeight[0].style.height = (window.innerHeight-screenYOffset)+"px";
             
-            start(user.toJSON()) // signing in to the message server
-            .then(res=>{
-                res.text().then(data=>{
-                    let dataJson = JSON.parse(data);
+            // start(user.toJSON()) // signing in to the message server
+            // .then(res=>{
+            //     res.text().then(data=>{
+            //         let dataJson = JSON.parse(data);
 
-                    if(dataJson.length > 0){
-                        for(let j=0; j<dataJson.friends.length; j++){
-                            let tempUsers = dataJson.friends['friend '+j];
-                            user.appendFriend(new User(tempUsers.username,tempUsers.email, tempUsers.id, tempUsers.messages));
-                        }
-                        user.friendList.sort((user1, user2)=>{
-                            if(user1.username>user2.username)return 1;
-                            else if(user1.username<user2.username)return -1;
-                            return 0
-                        });
+            //         if(dataJson.length > 0){
+            //             for(let j=0; j<dataJson.friends.length; j++){
+            //                 let tempUsers = dataJson.friends['friend '+j];
+            //                 user.appendFriend(new User(tempUsers.username,tempUsers.email, tempUsers.id, tempUsers.messages));
+            //             }
+            //             user.friendList.sort((user1, user2)=>{
+            //                 if(user1.username>user2.username)return 1;
+            //                 else if(user1.username<user2.username)return -1;
+            //                 return 0
+            //             });
             
-                        for(let i =0; i<user.friendList.length; i++) {
-                            contactList.innerHTML += user.friendList[i].toHtml();
-                        } 
-                        updateUserClick();
-                    }
+            //             for(let i =0; i<user.friendList.length; i++) {
+            //                 contactList.innerHTML += user.friendList[i].toHtml();
+            //             } 
+            //             updateUserClick();
+            //         }
                     
-                })
-                .catch(err=>console.log("There's an error: ", err));
+            //     })
+            //     .catch(err=>console.log("There's an error: ", err));
 
-            });
+            // });
 
             if(currentFriend == null) displayMessage.style.display = 'none';
 
@@ -399,7 +423,7 @@ window.addEventListener('load', function(e){
                                 background: rgb(180, 180, 180);
                                 border-radius:2vh;
                             ">
-                                <p style="font-family:roboto; "> Login Failed!!<br /></p>
+                                <p style="font-family:roboto; "> Connection Failed!!<br />Can't connect to TND. </p>
                                 <div class="retry-button" style="
                                         width:fit-content;
                                         background-color:rgb(40,40,180);

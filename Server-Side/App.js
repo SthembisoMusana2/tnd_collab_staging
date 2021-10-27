@@ -56,7 +56,7 @@ class User{
         if(this.cachedUsersList.length > 0){
             let tempFriendList = this.cachedUsersList[0];
             for(let i=0; i<tempFriendList.length; i++){
-                let tUser = tempFriendList['friend'+i];
+                let tUser = tempFriendList['friend '+i];
                 let tUserObj = new User(tUser.username, tUser.email, tUser._id, []);
                 this.appendFriendList(tUserObj);
             }
@@ -80,6 +80,7 @@ class User{
             username:this.username,
             email:this.email,
             id:this.id,
+            userId:this.id,
             messages:this.recentListJSON(),
             friends:this.friendListToJSON()
         });
@@ -260,23 +261,31 @@ app.post('/addFriend', (req, res)=>{
     let userObj = searchArray(users, user.email, 'email');
     let owner = searchArray(users, user.owner, 'email');
     res.end();
+    console.log(' Adding friend to save...');
     
     if(userObj == null){
     UserModel.findOne({email:user.email})
         .then((dbRes)=>{
-            let tempUser = new User(dbRes.username, dbRes.email, dbRes._id, dbRes.messages);
+            let id = dbRes._id.toString();
+            let tempUser = new User(dbRes.username, dbRes.email, id, dbRes.messages);
             tempUser.cachedUsersList.push(dbRes.friends);
-            tempUser.friendsJSONToUserObjects();
+            // tempUser.friendsJSONToUserObjects();
             users.push(tempUser);
-            owner.appendFriendList(tempUser);
-            console.log('Friend added successfully')
+            owner.appendFriendList(tempUser);            
         })
         .catch(err=>{console.log(err)})
-        return;
     }
     else{
         owner.appendFriendList(userObj);
     }
+
+    UserModel.findOneAndReplace(owner.id, owner.toJSON())
+    .then(res=>{
+        console.log('Saved Successfully:\n', res);
+    })
+    .catch(err=>{
+        console.log(err);
+    });
 });
 
 app.post('/search', (req, res)=>{
@@ -356,7 +365,6 @@ app.post('/login', (req, resp)=>{
     .then(async res=>{
         if(res.status == ''){ // the login was successful
             resp.write('successful$');
-            console.log('Login Successful')
             let userSearch = searchArray(users, res.username);
             if(userSearch == null){
                 await UserModel.findOne({email:userFormData.email})
@@ -379,4 +387,5 @@ app.post('/login', (req, resp)=>{
         }
     })
     .catch(err=>{})
+    console.log('Login Successful')
 });
