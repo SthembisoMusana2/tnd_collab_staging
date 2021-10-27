@@ -4,7 +4,7 @@ addEventListener('load', function(e){
     let login = document.getElementById('login');
     let loginLink = document.getElementById('login-link');
     let signup = document.getElementById('signup');
-    let signupLink = this.document.getElementById('signup-link');
+    let signupLink = document.getElementById('signup-link');
     const loginForm = document.getElementById('login-form');
     const signUpForm = document.getElementById('signup-form');
     const spinner = document.getElementsByClassName('spinner')[0];

@@ -88,7 +88,7 @@ class User{
             if(user1.username > user2.username)return -1;
             else if(user1.username < user2.username) return 1;
             return 0;
-        })
+        });
     }
 
     toJSON(){
@@ -101,17 +101,17 @@ class User{
 
     toHtml(){
         this.profileImage = `../TND-Logo_-Unpacked-Parts.png`;
+        // this.latestMessage != null?this.latestMessage.getMessagebody():'hello friend..';
         return(
             `<div class="user" id=${this.useremail}>
                     <div class ="profile-image circle">
                         <img src=${this.profileImage} class="responsive-img circle profile-picture" alt="Profile">
                     </div>
-    
                     <div class="user-name">
                         <h5 class="user-name-text no-padding">${this.username}</h4>
-                        <span class="lmessage">${this.latestMessage != null?this.latestMessage.getMessagebody():'hello friend..'}</span>
+                        <span class="lmessage">${this.useremail}</span>
                     </div>
-                    <h6 class="timestamp">00:00</h6>
+                    <!-- <h6 class="timestamp">00:00</h6> -->
                 </div>`
         );
     }
@@ -182,13 +182,16 @@ async function start(user={username:null, email:null, id:id}){
     });
 }
 
+const userNameInfo = document.getElementsByClassName('group-name')[0];
+const userEmailInfo = document.getElementsByClassName('group-description')[0];
+
 function updateUserClick(){
     let usersHtml = document.getElementsByClassName('user');
+    let userEmail = document.getElementsByClassName('lmessage');
     for(let i=0; i<usersHtml.length; i++){
     usersHtml[i].addEventListener('click', function(e){
             let userName  = usersHtml[i].innerText.split('\n')[0];
-            console.log(userName);
-            currentFriend = searchArray(user.friendList, userName);
+            currentFriend = searchArray2(user.friendList, userEmail[i].innerText, 'useremail');
             if(currentFriend != null){
                 displayMessage.style.display = 'block';
                 profileTitle.innerText = currentFriend.username;
@@ -199,49 +202,30 @@ function updateUserClick(){
     }
 }
 
-function signIn(){
-    let username;
-    let email = 'sthembisomusana2@gmail.com';
-    let id = '12413581283912';
-    // username = prompt('Enter Name:');
-    // grab the user input from the screen and send it to firebase...
-    // get the user name and email from firebase and initialise user.
-    return new User(username, email, id, {});
-}
-
-function login(userD){
-    
-}
-
 function createMessageObject(message={sender:'', sEmail:'', recipientType:'',
-recipient:'',
-messageBody:'',
-messageTime:'',
-sent:0,
-group:''}){
-
+    recipient:'',
+    messageBody:'',
+    messageTime:'',
+    sent:0,
+    group:''}){
     return new Message(message.sender, message.sEmail, message.recipientType,message.recipient, message.messageBody, message.messageTime, 1, {});
-
 }
 
-let Users = [];
+const Users = [];
 const contactList = document.getElementById('contact-list');
 const profileTitle = document.getElementById('profile-title');
 const messageDisplayWind = document.getElementById("message-display");
 const messageField = document.getElementById('message-field');
 const displayMessage = document.getElementsByClassName('display-content')[0];
+const groupMembersList = document.getElementById('group-members');
 
 let user;
-
 let currentFriend = null;
-
-
 let screenYOffset = 1;
-let groupMembersList = document.getElementById('group-members');
+
 let loginSuccess = false;
 
 window.addEventListener('load', function(e){
-
     let userDetails = { 
         username:localStorage.getItem('username'), 
         email:localStorage.getItem('email'), 
@@ -259,6 +243,8 @@ window.addEventListener('load', function(e){
     }
     else{
         user = new User(userDetails.username, userDetails.email, userDetails.id, []);
+        userNameInfo.innerText =' Name: '+user.username;
+        userEmailInfo.innerText = ' Email: '+user.useremail;
     }
 
     signin(userDetails).then(function(res){
@@ -274,11 +260,11 @@ window.addEventListener('load', function(e){
                     let tempUser = new User(temp.username, temp.email, temp.email);
                     user.appendFriend(tempUser);
                }
-
                user.friendList.sort((user1, user2)=>{
-                if(user1.username>user2.username)return 1;
-                else if(user1.username<user2.username)return -1;
-                return 0});
+                    if(user1.email>user2.email)return 1;
+                    else if(user1.email<user2.email)return -1;
+                    return 0
+                });
 
             for(let i =0; i<user.friendList.length; i++) {
                 contactList.innerHTML += user.friendList[i].toHtml();
@@ -289,12 +275,11 @@ window.addEventListener('load', function(e){
     }).catch(err=>{
         loginSuccess = false;
     });
-
+    
     loginSuccess = sessionStorage.getItem('loginStatus');
 
     setTimeout(function(){
         if(loginSuccess == 'true'){
-
             const colHeight = document.getElementsByClassName('body');
             const screenWindow = document.getElementsByTagName('body');
             const sendButton = document.getElementById('send');
@@ -304,33 +289,6 @@ window.addEventListener('load', function(e){
             screenWindow[0].style.maxHeight = this.window.innerHeight+'px';
             screenWindow[0].style.overflowY = 'hidden';
             colHeight[0].style.height = (window.innerHeight-screenYOffset)+"px";
-            
-            // start(user.toJSON()) // signing in to the message server
-            // .then(res=>{
-            //     res.text().then(data=>{
-            //         let dataJson = JSON.parse(data);
-
-            //         if(dataJson.length > 0){
-            //             for(let j=0; j<dataJson.friends.length; j++){
-            //                 let tempUsers = dataJson.friends['friend '+j];
-            //                 user.appendFriend(new User(tempUsers.username,tempUsers.email, tempUsers.id, tempUsers.messages));
-            //             }
-            //             user.friendList.sort((user1, user2)=>{
-            //                 if(user1.username>user2.username)return 1;
-            //                 else if(user1.username<user2.username)return -1;
-            //                 return 0
-            //             });
-            
-            //             for(let i =0; i<user.friendList.length; i++) {
-            //                 contactList.innerHTML += user.friendList[i].toHtml();
-            //             } 
-            //             updateUserClick();
-            //         }
-                    
-            //     })
-            //     .catch(err=>console.log("There's an error: ", err));
-
-            // });
 
             if(currentFriend == null) displayMessage.style.display = 'none';
 
@@ -353,7 +311,6 @@ window.addEventListener('load', function(e){
                 if(e.key == 'Enter'){
                     let messageBody = messageField.value;
                     if(messageBody.length > 0){
-                        console.log(currentFriend)
                         let messageObject  = new Message(user.username,user.useremail, 'single', currentFriend.useremail, messageBody, Date(Date.now()));
                         messageDisplayWind.innerHTML += messageObject.toHtml();
                         messageField.value = '';
@@ -361,15 +318,10 @@ window.addEventListener('load', function(e){
                         sendMessage(messageObject.toJSON())
                         .then(res=>{
                             res.text()
-                            .then(data=>{
-                                // let message = createMessageObject(JSON.parse(data));
-                                // currentFriend.messageList.push(message);
-                                // messageDisplayWind.innerHTML += message.toHtml();
-                            });
+                            .then(data=>{});
                         });
                     }
-                }
-            });
+            }});
 
             setInterval(function(){ // poll for new messages
                 poll(user.toJSON())
@@ -381,7 +333,7 @@ window.addEventListener('load', function(e){
                         if(resJSON.length > 0)
                         for(let i = 0; i<resJSON.length; i++){
                             // console.log(resJSON['message'+i].sender)
-                            friend = searchArray(user.friendList, resJSON['message'+i].sender);
+                            friend = searchArray2(user.friendList, resJSON['message'+i].sEmail, 'useremail');
             
                             if(friend == null && resJSON.length > 0){
                                 //add friend in the server...
@@ -406,7 +358,6 @@ window.addEventListener('load', function(e){
                     });
                 });
             }, 500);
-
         }
         else{
             const bodyE = document.getElementsByTagName('body')[0];
@@ -442,7 +393,6 @@ window.addEventListener('load', function(e){
                                 </div></div>`
             
         }
-
     }, 500);
     
 });
@@ -453,8 +403,6 @@ window.addEventListener('resize', function(){
     colHeight[0].style.height = (window.innerHeight-screenYOffset)+"px";
     messageDisplayWind.style.height = this.innerHeight-this.innerHeight*0.25 + 'px';
 });
-
-
 
 
 function searchArray(arrayObject = [], key){
@@ -481,4 +429,40 @@ function searchArray(arrayObject = [], key){
                 return null;
         }
     }
+}
+
+function searchArray2(arrayObject = [], key, scheme='username'){
+    // sort the array according to emails
+    sortArrayUsers(arrayObject, scheme); // sort the array first to how you want to search it
+    let tempObj = arrayObject[0];
+    if(arrayObject.length > 0){
+        if(tempObj[scheme] === key){
+            return tempObj;
+        }
+        else{ // binary search algorithm
+            
+            if(arrayObject.length > 1){
+                let middle = arrayObject[Math.floor(arrayObject.length/2)];
+    
+                if(middle[scheme] === key)
+                    return middle;
+                else if(key > middle[scheme]) // it means we should look from the second half
+                    return searchArray2(arrayObject.slice(Math.floor(arrayObject.length/2+1), 
+                            arrayObject.length), key, scheme); // looking from the middle of the array
+                else
+                    // search the second half
+                    return searchArray2(arrayObject.slice(0, Math.floor(arrayObject.length/2)), key, scheme); 
+            }else 
+                return null;
+        }
+    }
+    
+}
+
+function sortArrayUsers(array=[], scheme){
+    array.sort((user1, user2)=>{
+        if(user1[scheme]> user2[scheme])return 1;
+        else if(user1[scheme] < user2[scheme])return -1;
+        return 0;
+    });
 }

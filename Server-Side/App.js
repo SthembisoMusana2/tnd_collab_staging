@@ -106,6 +106,7 @@ class Group{
     }
 }
 
+
 function searchArray(arrayObject = [], key, scheme='username'){
     // sort the array according to emails
     sortArrayUsers(arrayObject, scheme); // sort the array first to how you want to search it
@@ -192,8 +193,6 @@ app.post('/users', (req, res)=>{ // request for your friend list
     let userObj = searchArray(users, user.username);
     if(userObj!= null) res.end(JSON.stringify(userObj.friendListToJSON()));    
     else res.end(JSON.stringify({length:0}))
-
-    // console.log(users);
 });
 
 app.post('/send', (req, res)=>{
@@ -261,22 +260,23 @@ app.post('/addFriend', (req, res)=>{
     let userObj = searchArray(users, user.email, 'email');
     let owner = searchArray(users, user.owner, 'email');
     res.end();
-    console.log(' Adding friend to save...');
-    
+    console.log('Adding friend to save...');
     if(userObj == null){
-    UserModel.findOne({email:user.email})
-        .then((dbRes)=>{
-            let id = dbRes._id.toString();
-            let tempUser = new User(dbRes.username, dbRes.email, id, dbRes.messages);
-            tempUser.cachedUsersList.push(dbRes.friends);
-            // tempUser.friendsJSONToUserObjects();
-            users.push(tempUser);
-            owner.appendFriendList(tempUser);            
-        })
-        .catch(err=>{console.log(err)})
+        UserModel.findOne({email:user.email})
+            .then((dbRes)=>{
+                let id = dbRes._id.toString();
+                let tempUser = new User(dbRes.username, dbRes.email, id, dbRes.messages);
+                tempUser.cachedUsersList.push(dbRes.friends);
+                users.push(tempUser);
+                let test = searchArray(owner.friendsList, user.email, 'email');
+                if(test == null) owner.appendFriendList(tempUser);
+                console.log(test);
+            })
+            .catch(err=>{console.log(err)})
     }
     else{
-        owner.appendFriendList(userObj);
+        let test = searchArray(owner.friendsList, user.email, 'email');
+        if(test == null) owner.appendFriendList(userObj);
     }
 
     UserModel.findOneAndReplace(owner.id, owner.toJSON())
@@ -290,9 +290,7 @@ app.post('/addFriend', (req, res)=>{
 
 app.post('/search', (req, res)=>{
     let searchData = JSON.parse(req.body);
-
     let userObj = searchArray(users, searchData.name);
-
     if(userObj != null){
         let tempJSON = {}
         tempJSON.length = 1;
@@ -319,7 +317,7 @@ app.post('/search', (req, res)=>{
         })
         .catch(err=>{
             console.log(err);
-        })
+        });
         return;
     }
 });
@@ -330,28 +328,28 @@ app.post('/signup', (req, res)=>{
     .then(user=>{
         console.log('Evaluating response');
         if(user.status == 'Firebase: Error (auth/email-already-in-use).'){
-            console.log(user)
+            // console.log(user)
             res.write('Email already in use $');
             res.end(JSON.stringify(user));
         }
         else if( user.status == 'Firebase: Error (auth/invalid-email).'){
-            console.log(user)
+            // console.log(user)
             res.write('Invalid Email address$');
             res.end(JSON.stringify(user));
         }
         else if(user.status === ''){
-            console.log('I run')
+            // console.log('I run')
             res.write('Sign Up Successful$');
             res.end(JSON.stringify(user));
             let tempUser = new User(user.username, user.email, user.id, []);
             users.push(tempUser); // add the user to the local list
-            console.log(users);
+            // console.log(users);
             let UserMod = new UserModel(tempUser.toJSON());
             UserMod.save()
             .then(()=>{
                 
             }).catch(err=>{console.log(err)})
-            console.log(user)
+            // console.log(user)
             // back up the user information in the database
         }
 
