@@ -357,19 +357,15 @@ window.addEventListener('load', function(e){
                                     res.text()
                                     .then(data=>{
                                         f = JSON.parse(data);
-
-                                        console.log(f);
+                                        let tempFriend = new User(resJSON['message'+i].sender, resJSON['message'+i].sEmail,f.id, f.avatar, []);
+                                        contactList.innerHTML += tempFriend.toHtml();
+                                        user.appendFriend(tempFriend);
+                                        updateUserClick();
                                     })
                                     .catch(err=>{
                                         console.log(err);
                                     })
                                 });
-                                
-                                let tempFriend = new User(resJSON['message'+i].sender, resJSON['message'+i].sEmail,f.id, f.avatar, list);
-                                contactList.innerHTML += tempFriend.toHtml();
-                                user.appendFriend(tempFriend);
-                                updateUserClick();
-                                // console.log(friend)
                             }
                             else if(friend != null && resJSON.length > 0){
                                 friend.messageList.push(createMessageObject(resJSON['message'+i], friend.profileImage)); // add message to history
