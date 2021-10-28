@@ -44,7 +44,7 @@ class User{
         let tempObject = {length:this.friendsList.length};
         if(tempObject.length > 0){
             for(let i=0; i<tempObject.length; i++){
-                tempObject['friend '+i] = this.friendsList[i].toJSON();
+                tempObject['friend '+i] = this.friendsList[i].toFJSON();
             }
             return(tempObject);
         }
@@ -84,6 +84,16 @@ class User{
             userId:this.id,
             messages:this.recentListJSON(),
             friends:this.friendListToJSON()
+        });
+    }
+
+    toFJSON(){
+        return({
+            username:this.username,
+            email:this.email,
+            id:this.id,
+            avatar:this.imgUrl,
+            userId:this.id
         });
     }
 }
@@ -258,7 +268,6 @@ app.post('/addFriend', (req, res)=>{
     let user = JSON.parse(req.body);
     let userObj = searchArray(users, user.email, 'email');
     let owner = searchArray(users, user.owner, 'email');
-    res.end();
 
     if(userObj == null){
         UserModel.findOne({email:user.email})
@@ -269,12 +278,14 @@ app.post('/addFriend', (req, res)=>{
                 users.push(tempUser);
                 let test = searchArray(owner.friendsList, user.email, 'email');
                 if(test == null) owner.appendFriendList(tempUser);
+                res.end(JSON.stringify(tempUser.toFJSON()));
             })
             .catch(err=>{console.log(err)})
     }
     else{
         let test = searchArray(owner.friendsList, user.email, 'email');
         if(test == null) owner.appendFriendList(userObj);
+        res.end(JSON.stringify(userObj.toFJSON()));
     }
 
     UserModel.findOneAndReplace(owner.id, owner.toJSON())
@@ -288,7 +299,7 @@ app.post('/search', (req, res)=>{
     if(userObj != null){
         let tempJSON = {}
         tempJSON.length = 1;
-        tempJSON.user0 = userObj.toJSON();
+        tempJSON.user0 = userObj.toFJSON();
         res.end(JSON.stringify(tempJSON));
         return;
     }

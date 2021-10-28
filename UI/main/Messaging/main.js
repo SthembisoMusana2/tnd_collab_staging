@@ -340,12 +340,32 @@ window.addEventListener('load', function(e){
                         for(let i = 0; i<resJSON.length; i++){
                             // console.log(resJSON['message'+i].sender)
                             friend = searchArray2(user.friendList, resJSON['message'+i].sEmail, 'useremail');
-            
+                            let f;
                             if(friend == null && resJSON.length > 0){
                                 //add friend in the server...
                                 let list = [];
                                 list.push(createMessageObject(resJSON['message'+i]));
-                                let tempFriend = new User(resJSON['message'+i].sender, resJSON['message'+i].sEmail, 'defualt', list);
+
+                                fetch('http://127.0.0.1:8090/addFriend', {
+                                    method:'POST',
+                                    body:JSON.stringify({
+                                    email:resJSON['message'+i].sEmail,
+                                    owner:user.useremail
+                                    })
+                                })
+                                .then((res)=>{
+                                    res.text()
+                                    .then(data=>{
+                                        f = JSON.parse(data);
+
+                                        console.log(f);
+                                    })
+                                    .catch(err=>{
+                                        console.log(err);
+                                    })
+                                });
+                                
+                                let tempFriend = new User(resJSON['message'+i].sender, resJSON['message'+i].sEmail,f.id, f.avatar, list);
                                 contactList.innerHTML += tempFriend.toHtml();
                                 user.appendFriend(tempFriend);
                                 updateUserClick();
