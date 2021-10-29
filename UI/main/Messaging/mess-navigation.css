@@ -133,7 +133,7 @@
 .contact-list{
     overflow-y: auto;
     height: inherit;
-    display: none;
+    /* display: none; */
 }
 
 
@@ -158,4 +158,5 @@
 
 .chats-tab{
     border-right:1px solid rgb(179, 176, 176);
+    border-bottom: 2px solid blue;
 }

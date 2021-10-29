@@ -14,7 +14,7 @@ addEventListener('load', function(e){
     loginLink.addEventListener('click', function(e){
         e.preventDefault();
         login.style.display = 'none';
-        
+        signup.style.display = 'block';
         let avatarUrl = localStorage.getItem('avatar');
         if(avatarUrl == null){
             const overlay = document.getElementsByClassName('overlay')[0];
