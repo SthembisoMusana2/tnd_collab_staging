@@ -57,7 +57,7 @@ class User{
             let tempFriendList = this.cachedUsersList[0];
             for(let i=0; i<tempFriendList.length; i++){
                 let tUser = tempFriendList['friend '+i];
-                let tUserObj = new User(tUser.username, tUser.email, tUser._id, []);
+                let tUserObj = new User(tUser.username, tUser.email, tUser._id, tUser.avatar, []);
                 this.appendFriendList(tUserObj);
             }
         }
@@ -224,7 +224,7 @@ app.post('/send', (req, res)=>{
             UserModel.findOne({email:recipient})
             .then((dbRes)=>{
                 if(dbRes.length > 0){
-                    let tempUser = new User(dbRes.username, dbRes.email, dbRes._id, dbRes.messages, []);
+                    let tempUser = new User(dbRes.username, dbRes.email, dbRes._id, dbRes.avatar, dbRes.messages, []);
                     tempUser.cachedUsersList.push(dbRes.friends);
                     users.push(tempUser);
                     tempUser.updateMessageList(messageRef);
@@ -273,7 +273,7 @@ app.post('/addFriend', (req, res)=>{
         UserModel.findOne({email:user.email})
             .then((dbRes)=>{
                 let id = dbRes._id.toString();
-                let tempUser = new User(dbRes.username, dbRes.email, id, dbRes.messages);
+                let tempUser = new User(dbRes.username, dbRes.email, id, dbRes.avatar, dbRes.messages);
                 tempUser.cachedUsersList.push(dbRes.friends);
                 users.push(tempUser);
                 let test = searchArray(owner.friendsList, user.email, 'email');
@@ -289,7 +289,7 @@ app.post('/addFriend', (req, res)=>{
     }
 
     UserModel.findOneAndReplace(owner.id, owner.toJSON())
-    .then(res=>{})
+    .then(res=>{console.log('Friend Added Successfully to ->', owner.username, res)})
     .catch(err=>{console.log(err);});
 });
 
@@ -344,7 +344,7 @@ app.post('/signup', (req, res)=>{
             res.write('Sign Up Successful$');
             res.end(JSON.stringify(user));
             let tempUser = new User(user.username, user.email, user.id, userFormData.avatar, []);
-            console.log(tempUser);
+            // console.log(tempUser);
             users.push(tempUser); // add the user to the local list
             let UserMod = new UserModel(tempUser.toJSON());
             UserMod.save()
@@ -364,7 +364,8 @@ app.post('/login', (req, resp)=>{
             if(userSearch == null){
                 await UserModel.findOne({email:userFormData.email})
                 .then((dbRes)=>{
-                    let tempUser = new User(dbRes.username, dbRes.email, dbRes._id, dbRes.avatar, dbRes.messages);
+                    let id = dbRes._id.toString();
+                    let tempUser = new User(dbRes.username, dbRes.email, id, dbRes.avatar, dbRes.messages);
                     tempUser.cachedUsersList.push(dbRes.friends);
                     tempUser.friendsJSONToUserObjects();
                     users.push(tempUser);

@@ -198,7 +198,7 @@ function updateUserClick(){
                 friendProfilePhoto.setAttribute('src', currentFriend.profileImage);
                 messageDisplayWind.innerHTML = '';
                 messageDisplayWind.innerHTML = currentFriend.messageListToHtml();
-
+                messageDisplayWind.scrollTop = messageDisplayWind.scrollHeight;
                 if(window.innerWidth <= 768){
                     const chatsWindow = document.getElementById('chats');
                     const navWindow = document.getElementById('navigation');
@@ -254,21 +254,28 @@ window.addEventListener('load', function(e){
         window.location.pathname = path;
     }
     else{
-        user = new User(userDetails.username, userDetails.email, userDetails.id, userDetails.img, []);
-        userNameInfo.innerText =`${user.username}`;
-        userEmailInfo.innerHTML = `<p><a href='maitlto:'+${user.useremail} > ${user.useremail}</a></p>`
-        profileImage.setAttribute('src', userDetails.img);
-        profileView.setAttribute('src', userDetails.img);
+        // user = new User(userDetails.username, userDetails.email, userDetails.id, userDetails.img, []);
+        // userNameInfo.innerText =`${user.username}`;
+        // userEmailInfo.innerHTML = `<p><a href='maitlto:'+${user.useremail} > ${user.useremail}</a></p>`
+        // profileImage.setAttribute('src', userDetails.img);
+        // profileView.setAttribute('src', userDetails.img);
     }
 
     signin(userDetails).then(function(res){
        sessionStorage.setItem('loginStatus', 'true');
        res.text()
        .then(data=>{
-           let respData = data.split('$');
-           let userData = JSON.parse(respData[1]);
-           let friends = userData['friends'];
-           if(friends.length > 0){
+            let respData = data.split('$');
+            let userData = JSON.parse(respData[1]);
+            user = new User(userData.username, userData.email, userData.id, userData.avatar, []);
+
+            userNameInfo.innerText =`${user.username}`;
+            userEmailInfo.innerHTML = `<p><a href='maitlto:'+${user.useremail} > ${user.useremail}</a></p>`
+            profileImage.setAttribute('src', user.profileImage);
+            profileView.setAttribute('src', user.profileImage);
+
+            let friends = userData['friends'];
+            if(friends.length > 0){
                for(let i=0; i<friends.length; i++){
                     let temp = friends['friend '+i];
                     let tempUser = new User(temp.username, temp.email, temp.email, temp.avatar, []);
@@ -313,6 +320,7 @@ window.addEventListener('load', function(e){
                     messageDisplayWind.innerHTML += messageObject.toHtml();
                     messageField.value = '';
                     currentFriend.messageList.push(messageObject);
+                    messageDisplayWind.scrollTop = messageDisplayWind.scrollHeight;
                     sendMessage(messageObject.toJSON())
                     .then(res=>{
                         // console.log(res);
@@ -329,6 +337,7 @@ window.addEventListener('load', function(e){
                         messageDisplayWind.innerHTML += messageObject.toHtml();
                         messageField.value = '';
                         currentFriend.messageList.push(messageObject);
+                        messageDisplayWind.scrollTop = messageDisplayWind.scrollHeight;
                         sendMessage(messageObject.toJSON())
                         .then(res=>{
                             res.text()
@@ -338,56 +347,60 @@ window.addEventListener('load', function(e){
             }});
 
             setInterval(function(){ // poll for new messages
-                poll(user.toJSON())
-                .then(function(res){
-                    res.text()
-                    .then(data=>{
-                        let resJSON = JSON.parse(data);
-                        let friend
-                        if(resJSON.length > 0)
-                        for(let i = 0; i<resJSON.length; i++){
-                            // console.log(resJSON['message'+i].sender)
-                            friend = searchArray2(user.friendList, resJSON['message'+i].sEmail, 'useremail');
-                            let f;
-                            if(friend == null && resJSON.length > 0){
-                                //add friend in the server...
-                                let list = [];
-                                list.push(createMessageObject(resJSON['message'+i]));
+                if(user != null){
+                    poll(user.toJSON())
+                    .then(function(res){
+                        res.text()
+                        .then(data=>{
+                            let resJSON = JSON.parse(data);
+                            let friend
+                            if(resJSON.length > 0)
+                            for(let i = 0; i<resJSON.length; i++){
+                                // console.log(resJSON['message'+i].sender)
+                                friend = searchArray2(user.friendList, resJSON['message'+i].sEmail, 'useremail');
+                                let f;
+                                if(friend == null && resJSON.length > 0){
+                                    //add friend in the server...
+                                    let list = [];
+                                    list.push(createMessageObject(resJSON['message'+i]));
 
-                                fetch('http://127.0.0.1:8090/addFriend', {
-                                    method:'POST',
-                                    body:JSON.stringify({
-                                    email:resJSON['message'+i].sEmail,
-                                    owner:user.useremail
+                                    fetch('http://127.0.0.1:8090/addFriend', {
+                                        method:'POST',
+                                        body:JSON.stringify({
+                                        email:resJSON['message'+i].sEmail,
+                                        owner:user.useremail
+                                        })
                                     })
-                                })
-                                .then((res)=>{
-                                    res.text()
-                                    .then(data=>{
-                                        f = JSON.parse(data);
-                                        let tempFriend = new User(resJSON['message'+i].sender, resJSON['message'+i].sEmail,f.id, f.avatar, []);
-                                        contactList.innerHTML += tempFriend.toHtml();
-                                        user.appendFriend(tempFriend);
-                                        updateUserClick();
-                                    })
-                                    .catch(err=>{
-                                        console.log(err);
-                                    })
-                                });
-                            }
-                            else if(friend != null && resJSON.length > 0){
-                                friend.messageList.push(createMessageObject(resJSON['message'+i], friend.profileImage)); // add message to history
-                                if(friend === currentFriend){
-                                    // update the screen..
-                                    messageDisplayWind.innerHTML = currentFriend.messageListToHtml();
-                                    // scroll down;
+                                    .then((res)=>{
+                                        res.text()
+                                        .then(data=>{
+                                            f = JSON.parse(data);
+                                            let tempFriend = new User(resJSON['message'+i].sender, resJSON['message'+i].sEmail,f.id, f.avatar, []);
+                                            contactList.innerHTML += tempFriend.toHtml();
+                                            user.appendFriend(tempFriend);
+                                            updateUserClick();
+                                        })
+                                        .catch(err=>{
+                                            console.log(err);
+                                        })
+                                    });
+                                }
+                                else if(friend != null && resJSON.length > 0){
+                                    friend.messageList.push(createMessageObject(resJSON['message'+i], friend.profileImage)); // add message to history
+                                    if(friend === currentFriend){
+                                        // update the screen..
+                                        messageDisplayWind.innerHTML = currentFriend.messageListToHtml();
+                                        messageDisplayWind.scrollTop = messageDisplayWind.scrollHeight;
+                                        // scroll down;
+                                    }
                                 }
                             }
-                        }
-                        
+                            
+                        });
                     });
-                });
-            }, 500);
+                }
+                
+            }, 1000);
         }
         else{
             const bodyE = document.getElementsByTagName('body')[0];
@@ -432,6 +445,9 @@ window.addEventListener('resize', function(){
     let messageDisplayWind = document.getElementById("message-display");
     colHeight[0].style.height = (window.innerHeight-screenYOffset)+"px";
     messageDisplayWind.style.height = this.innerHeight-this.innerHeight*0.25 + 'px';
+    if(this.innerWidth < 768){
+        window.location.replace('messaging.html');
+    }
 });
 
 

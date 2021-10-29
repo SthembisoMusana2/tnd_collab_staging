@@ -6,6 +6,11 @@
     display: none;
 }
 @media screen and (max-width: 768px){
+    .setting{
+        /* display: none; */
+        border:2px solid blue;
+    }
+
     .view-page{
         display: block;
         /* border: 3px solid blue; */
@@ -60,5 +65,10 @@
         background-color: rgb(167, 165, 165);
         border-radius: 1vh;
         color: rgb(20, 20, 20);
+    }
+
+    .setting{
+        display: none;
+        border:2px solid blue;
     }
 }
