@@ -198,6 +198,14 @@ function updateUserClick(){
                 friendProfilePhoto.setAttribute('src', currentFriend.profileImage);
                 messageDisplayWind.innerHTML = '';
                 messageDisplayWind.innerHTML = currentFriend.messageListToHtml();
+
+                if(window.innerWidth <= 768){
+                    const chatsWindow = document.getElementById('chats');
+                    const navWindow = document.getElementById('navigation');
+
+                    navWindow.style.display = 'none';
+                    chatsWindow.style.display = 'block';
+                }
             }
         });
     }

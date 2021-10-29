@@ -2,6 +2,9 @@
     overflow-y: auto;
     font-size: small;
     background-color: rgb(216, 211, 211);
+    width: 100%;
+    display: none;
+    height: inherit;
 }
 
 

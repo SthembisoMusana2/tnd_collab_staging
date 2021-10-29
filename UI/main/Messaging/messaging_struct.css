@@ -2,8 +2,7 @@
 .body{
     display:flex;
     width: 100%; 
-    /* border:1px solid black; */
-    /* height: 45em;   */
+    background-color: rgb(184, 183, 183);
 }
 
 .col{

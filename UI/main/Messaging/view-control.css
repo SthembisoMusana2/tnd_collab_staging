@@ -1,0 +1,64 @@
+.view-page{
+    width: 100%;
+    display: flex;
+}
+.back{
+    display: none;
+}
+@media screen and (max-width: 768px){
+    .view-page{
+        display: block;
+        /* border: 3px solid blue; */
+    }
+    .navigation{
+        width: 100%;
+        /* display: flex; */
+        /* display: none; */
+        /* border: 2px solid blue; */
+    } 
+    .chats{
+        display: block;
+        width: 100%;
+    }
+
+    .edit-bar{
+        /* border: 2px solid blue; */
+        width: 100%;
+    }
+    .back{
+        display: block;
+        /* border: 1px solid black; */
+        background-color: grey;
+        margin-left: auto;
+        margin-right: 2vh;
+        height: fit-content;
+        padding: 0.8vh;
+        margin-top: 0.4vh;
+        border-radius: 1vh;
+        transform: scale(0.9);
+    }
+
+    .back:active{
+        transform: scale(1);
+    }
+
+    .img-item{
+        width:8vh;
+        height: 8vh;
+        border: 3px sold blue;
+    }
+
+    .next-b{
+        /* border: 1px solid black; */
+        margin-top: 0px;
+        position: relative;
+        top: -5vh;
+        width: fit-content;
+        padding: 1vh;
+        float: right;
+        margin-right:2vh;
+        background-color: rgb(167, 165, 165);
+        border-radius: 1vh;
+        color: rgb(20, 20, 20);
+    }
+}
