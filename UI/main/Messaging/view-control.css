@@ -5,11 +5,10 @@
 .back{
     display: none;
 }
+.setting{
+    background-color:rgb(229, 226, 226);
+}
 @media screen and (max-width: 768px){
-    .setting{
-        /* display: none; */
-        border:2px solid blue;
-    }
 
     .view-page{
         display: block;
@@ -69,6 +68,6 @@
 
     .setting{
         display: none;
-        border:2px solid blue;
+        /* border:2px solid blue; */
     }
 }
