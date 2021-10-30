@@ -1,0 +1,80 @@
+
+body{
+    background-color:rgb(226, 218, 218);
+    color:rgb(0, 0, 0);
+}
+
+.head{
+    text-align: center;
+}
+
+
+.show-cards{
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    margin-top: 4em;
+    margin-bottom: 5vh;
+}
+
+.card-container{
+    background-color: rgb(221, 214, 214);
+    height: 18em;
+    margin-left: auto;
+    margin-right: auto;
+    width: 30%;
+}
+
+.card-piece{   
+    padding-top: 0.5em;
+    color:rgb(0, 174, 255);
+    border-radius: 10%;
+    width: 95%;
+    height: 17em;
+    box-shadow: 2px 2px 5px 1px #e4e2e2, -2px -2px 5px 1px #e4e2e2;
+    transform: scale(1);
+    transition:all 1s;
+}
+
+.card-piece:hover{
+    transform: scale(0.9);
+    transition:transform 1s;
+    border-left: 2px solid blue;
+}
+
+.c-image{
+    width: 90%;
+    height: 10em;
+    margin: 5px auto 5px auto;
+    max-height: 10em;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+}
+
+.c-text{
+    width: 90%;
+    height:4em;
+    margin: 5px auto 5px auto;
+    font-family: Roboto, sans-serif, 'Times New Roman', Times, serif;
+    text-align: center;
+    font-size: 1.5em;
+}
+
+.footer{
+    position:fixed;
+    bottom: 0%;
+    width: 100%;
+    height: 4em;
+    background-color: #00aeff;
+}
+
+@media screen and (max-width:768px) {
+    .card-container{
+        width: 100%;
+    }
+}

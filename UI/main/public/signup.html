@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="./signup.css" />
+    <link rel="stylesheet" href="./spinner.css" />
+    <link rel="stylesheet" href="./view-control.css"
+
+    <!-- Firebase config for cloud storage -->
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+    <!-- Firebase services I need to use -->
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-storage.js"></script>
+
+    <title>Login</title>
+</head>
+
+<body class="container">
+    <div class="overlay">
+        <div class="avatar-overlay">
+            <div class="text">
+                <p class="heading-text">Select an avatar for your Acount</p>
+            </div>
+            
+            <hr />
+            <div class="img-container">
+            </div>
+            <div class="next-b" id="next-b"><span>Next</span></div>
+        </div>
+    </div>
+
+    <div class="signup" id='signup'>
+        <div class="spinner center verticalCenter"></div>
+        <div class='signup-form container'>
+            <form class='form' id ='signup-form' autocomplete="off">
+                <input name ='username' placeholder="username" type="text" class="browser-default field field1" required/><br />
+                <input name ="email" type='email' placeholder="email" class='browser-default field field1' required/><br />
+                <input name ="password"  id = 'pass'type='password' placeholder="password" class='browser-default field field1' required/><br />
+                <input name ="cpassword" id="cpassword" type='password' placeholder="confirm password" class="browser-default field field1" required />
+                <input type='submit' value='Sign Up' class='browser-default field submit' />
+            </form>
+        </div>
+        <div class ='text'>
+            <p>Already signed up? <a id = 'signup-link' href="">login</a></p>
+        </div>
+    </div>
+
+
+    <div id="login" class="container">
+        <div class="spinner-cont">
+            <div class="spinner center verticalCenter"></div>
+        </div>
+        
+        <div class='signup-form container'>
+            <form class='form' id='login-form' autocomplete="off">
+                <input name = "email" placeholder="email" type="text" class="browser-default field field1" required/><br />
+                <!-- <input type='email' placeholder="email" class='browser-default field' required/><br /> -->
+                <input type='password' name="password" placeholder="password" class='browser-default field field1' required/><br />
+                <input type='submit' value='Login' class='browser-default field submit' />
+            </form>
+        </div>
+        <div class ='text'>
+            <p>Don't have an account? <a id='login-link' href="">Sign up</a><br />
+            <a id="fg-password">Forgotten Password?</a>
+            </p>
+        </div>
+    </div>
+
+</body>
+
+<script src="./login.js"></script>
+<script src="./avatar.js"></script>
+
+</html>

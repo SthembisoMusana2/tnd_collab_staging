@@ -1,0 +1,86 @@
+.chat-info{
+    overflow-y: auto;
+    font-size: small;
+    background-color: rgb(216, 211, 211);
+    width: 100%;
+    display: none;
+    height: inherit;
+}
+
+
+
+.profile-view-group-info{
+    font-size: small;
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+.profile-view-img{
+    width: 35vh;
+    height: 35vh;
+    margin-top:2vh ;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    border: 1px solid rgb(161, 159, 159);
+    padding: 1vh;
+}
+#profile-view{
+    margin: auto;
+    width: 33vh;
+    height: 33vh;
+}
+
+.group-members{
+    font-size: small;
+    display: flex;
+    flex-direction: column;
+    max-height: fit-content;
+    overflow-y: auto;
+}
+
+.info-title{
+    text-align: center;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: xx-large;
+    color: rgb(71, 69, 69);
+}
+
+.group-name{
+    text-align: center;
+    font-size: large;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    color: rgb(71, 69, 69);
+}
+
+.group-description{
+    text-align: center;
+    font-size: large;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    color: rgb(71, 69, 69);
+}
+
+.group-member-object{
+    display: flex;
+    width: 100%;
+    /* border-bottom:1px solid black; */
+    cursor: pointer;
+
+
+}
+
+.group-member-object:hover{
+    background-color: rgb(212, 209, 209);
+}
+
+.group-member-img{
+    width:2em;
+    height:2em;
+    background-color: rgb(191, 197, 197);
+}
+
+
+.member-name{
+    margin-left: 1em;
+    padding-top: 0.2em;
+}

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="./messaging_struct.css" />
+    <link rel="stylesheet" href="./mess-navigation.css" />
+    <link rel="stylesheet" href="./messageDisplay.css" />
+    <link rel="stylesheet" href="./profileView.css"  />
+    <link rel="stylesheet" href="./search.css" />
+    <link rel="stylesheet" href="./spinner.css" />
+    <link rel="stylesheet" href="./view-control.css" />
+    <link href="./favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Firebase config for cloud storage -->
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+    <!-- Firebase services I need to use -->
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-storage.js"></script>
+
+    <title>Messaging</title>
+</head>
+<body>
+
+    <div class="add-user-overlay">
+        <div class="close-overlay">
+            <span id ="close-overlay-t" style="color: white; font-size:xx-large; padding-left: 2%;">X</span>
+        </div>
+        <!-- <div class="spinner"></div> -->
+        <div class="search-user container">
+            <h5 class="search-title">Search </h5>
+            <div class="search-field">
+                <input type="search" placeholder="Type friend's username" id="search-string" class="browser-default">
+                <input type="button" value="Go" class="browser-default search-button" id="search-button" />
+            </div>
+            <h6 id="results-heading">Results ...</h6>
+            <div class="search-results">
+                <div class="spinner center"></div><br/>
+            </div>
+        </div>
+    </div>
+    <div class="body" id="body">
+        <div class="view-page row" id="view-page">
+            <div class="navigation no-padding" id="navigation">
+                <div class="profile">
+                    <div class ="profile-image circle">
+                        <img src="../TND-Logo_-Unpacked-Parts.png" class="responsive-img circle profile-picture" alt="Profile">
+                    </div>
+    
+                    <div class="title">
+                        <h5 class="title-text">Messaging</h4>
+                    </div>
+                    <div class="add-user" id="add-user">
+                        <img src="./add member.svg" alt="add-user" class="responsive-img add-user-icon"  />
+                    </div>
+                    <!-- <div class="more" id="more-menu"></div> -->
+                </div>
+                <div class="tabs" id="tabs">
+                    <div class="chats-tab tab" id="chats-tab"><span>Chats</span></div>
+                    <div class="profile-tab tab" id="profile-tab"><span>Profile</span></div>
+                </div>
+                <div class="tab-show" id="tab-show">
+                    <div class="contact-list" id="contact-list"></div>
+    
+                    <div class="chat-info" id="chat-info">
+                        <div class="profile-view-img-section">
+                            <div class="profile-view-img circle">
+                                <img src="../TND-Logo_-Unpacked-Parts.svg" class="responsive-img circle" id = "profile-view" alt="Profile View Image" />
+                            </div>
+                            <!-- <hr > -->
+                        </div>
+            
+                        <div class="profile-view-group-info">
+                            <h5 class="info-title">Profile Info</h5>
+                            <hr />
+                            <p class="group-name"></p>
+                            <p class="group-description"></p>
+                            <div class="group-members" id="group-members">
+                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+    
+            <div class="chats col no-padding" id="chats">
+                <!-- Top  -->
+                <div class="display-content">
+                    
+                    <div class="user-profile">
+                        <div class ="user-profile-image circle">
+                            <img src="../messaging-icon.png" id="friend-profile" class="responsive-img circle profile-picture" alt="Profile">
+                        </div>
+        
+                        <div class="title">
+                            <h5 class="profile-title-text" id="profile-title"> </h4>
+                        </div>
+                        <div class="back"  id="back"><span>Back</span></div>
+                        <!-- <div class="more" id="more-display-menu"></div> -->
+                    </div>
+                    <!-- Middle -->
+                    <div class="message-display " id = "message-display"></div>
+                    <!-- Bottom -->
+    
+                    <div class="edit-bar">
+                        <div class="edit-coll">
+                           
+                            <div class="edit-seg">
+                                <input type="text" placeholder="Message" name="message" class="browser-default edit-field" id ="message-field">
+                            </div>
+                        
+                            <a class="btn-floating waves-effect waves-light green-12 no-padding send-button" id="send">
+                                <!-- <i class="material-icons">send</i> -->
+                                <!-- <?xml version="1.0" encoding="utf-8"?> -->
+                                <!-- Generator: Adobe Illustrator 25.3.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+                                <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                viewBox="0 0 1366 768" style="enable-background:new 0 0 1366 768;" xml:space="preserve">
+                                <style type="text/css">
+                                .st0{fill:none;}
+                                .st1{fill:#ffffff;stroke:#ffffff;stroke-miterlimit:10;}
+                                </style>
+                                <path class="st0" d="M1015,371"/>
+                                <path class="st1" d="M1098.16,371.76C902.27,285.01,706.39,198.25,510.5,111.5c8,73,16,146,24,219c104.67,14,209.33,28,314,42
+                                C931.72,372.25,1014.94,372.01,1098.16,371.76z"/>
+                                <path class="st0" d="M996.34,337.8"/>
+                                <path class="st1" d="M1093.15,372.94C900.26,458.79,707.38,544.65,514.5,630.5c8.33-76,16.67-152,25-228c105-11,210-22,315-33
+                                C934.05,370.65,1013.6,371.79,1093.15,372.94z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="setting col s3" id="settings">
+                <div class="profile-view-img-section">
+                    <div class="profile-view-img circle">
+                        <img src="../TND-Logo_-Unpacked-Parts.svg" class="responsive-img circle" id = "profile-view" alt="Profile View Image" />
+                    </div>
+                  
+                </div>
+    
+                <div class="profile-view-group-info">
+                    <h5 class="info-title">TND</h5>
+                    <hr />     
+                    </div>
+                </div>
+            </div>
+                
+                
+            </div>
+    
+        </div>
+       
+        
+    </div>
+</body>
+<script src="./main.js">
+</script>
+<script src="./addUsers.js"></script>
+<script src="./viewControl.js"></script>
+</html>
