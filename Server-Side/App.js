@@ -167,6 +167,17 @@ async function login(user={email:'', password:''}){
    return await signIn(user.email, user.password);
 }
 
+function toRegExp(str=''){
+    let re = str.toLowerCase() + str.toUpperCase();
+    let newBuf = [];
+    let k = re.length/2;
+    for(let j=0; j<k; j++){
+        newBuf.push('['+re.charAt(j)+re.charAt(j+k)+']');
+    }
+    let regExp = newBuf.join('');
+    return(new RegExp(regExp));
+}
+
 // setting up the server
 let app = express();
 const PORT = process.env.PORT;
@@ -301,7 +312,7 @@ app.post('/addFriend', (req, res)=>{
 app.post('/search', (req, res)=>{
     res.setHeader('Access-Control-Allow-Origin', '*');
     let searchData = JSON.parse(req.body);
-    let userObj = searchArray(users, searchData.name);
+    let userObj = null;//searchArray(users, searchData.name);
     if(userObj != null){
         let tempJSON = {}
         tempJSON.length = 1;
@@ -310,7 +321,7 @@ app.post('/search', (req, res)=>{
         return;
     }
     else{
-        UserModel.find({username:searchData.name})
+        UserModel.find({username:toRegExp(searchData.name)})
         .then((dbRes)=>{
             if(dbRes.length > 0){
                 let tempJSON = {};
