@@ -153,29 +153,31 @@ function updateGroupMembers(UsersList){
     }
 }
 
+let serverUrl = 'https://tnd-messaging.herokuapp.com/'
+
 async function sendMessage(message){
-    return fetch('http://127.0.0.1:8090/send', {
+    return fetch(serverUrl+'send', {
         method:'POST',
         body:JSON.stringify(message)
     });
 }
 
 async function signin(user={username:String, email:String, id:id}){
-    return fetch('http://127.0.0.1:8090/login', {
+    return fetch(serverUrl+'login', {
         method:'POST',
         body:JSON.stringify(user)
     });
 }
 
 async function poll(user={username:null, email:null, id:id}){
-    return fetch('http://127.0.0.1:8090/poll', {
+    return fetch(serverUrl+'poll', {
         method:'POST',
         body:JSON.stringify(user)
     });
 }
 
 async function start(user={username:null, email:null, id:id}){
-    return fetch('http://127.0.0.1:8090/users', {
+    return fetch(serverUrl+'users', {
         method:'POST',
         body:JSON.stringify(user)
     });
@@ -247,18 +249,7 @@ window.addEventListener('load', function(e){
 
     if(userDetails.username == null){
         // Not signed in...
-        let path = window.location.pathname.split('/');
-        path.pop();
-        path.push('signup.html');
-        path = path.join('/');
-        window.location.pathname = path;
-    }
-    else{
-        // user = new User(userDetails.username, userDetails.email, userDetails.id, userDetails.img, []);
-        // userNameInfo.innerText =`${user.username}`;
-        // userEmailInfo.innerHTML = `<p><a href='maitlto:'+${user.useremail} > ${user.useremail}</a></p>`
-        // profileImage.setAttribute('src', userDetails.img);
-        // profileView.setAttribute('src', userDetails.img);
+        window.location.replace('signup.html');
     }
 
     signin(userDetails).then(function(res){
@@ -364,7 +355,7 @@ window.addEventListener('load', function(e){
                                     let list = [];
                                     list.push(createMessageObject(resJSON['message'+i]));
 
-                                    fetch('http://127.0.0.1:8090/addFriend', {
+                                    fetch(serverUrl+'addFriend', {
                                         method:'POST',
                                         body:JSON.stringify({
                                         email:resJSON['message'+i].sEmail,
@@ -400,7 +391,7 @@ window.addEventListener('load', function(e){
                     });
                 }
                 
-            }, 1000);
+            }, 5000);
         }
         else{
             const bodyE = document.getElementsByTagName('body')[0];
@@ -436,7 +427,7 @@ window.addEventListener('load', function(e){
                                 </div></div>`
             
         }
-    }, 500);
+    }, 1000);
     
 });
 
@@ -446,7 +437,7 @@ window.addEventListener('resize', function(){
     colHeight[0].style.height = (window.innerHeight-screenYOffset)+"px";
     messageDisplayWind.style.height = this.innerHeight-this.innerHeight*0.25 + 'px';
     if(this.innerWidth < 768){
-        window.location.replace('messaging.html');
+        // window.location.replace('messaging.html');
     }
 });
 

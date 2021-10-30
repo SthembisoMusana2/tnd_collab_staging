@@ -19,8 +19,10 @@ function resultTemplate(user={username:'', email:'', id:0, avatar:''}){
     );
 }
 
+let serveUrl = 'https://tnd-messaging.herokuapp.com/'
+
 async function searchFriend(friend = {name:''}){
-    return fetch('http://127.0.0.1:8090/search', {
+    return fetch(serveUrl+'search', {
         method:'POST',
         body:JSON.stringify(friend)
     });
@@ -67,7 +69,7 @@ window.addEventListener('load', function(e){
                                             
                                             let test2 = searchArray2(user.friendList, email, 'useremail');
                                             if(test2 == null){
-                                                fetch('http://127.0.0.1:8090/addFriend', {
+                                                fetch(serverUrl+'addFriend', {
                                                     method:'POST',
                                                     body:JSON.stringify({
                                                     email:email,
@@ -134,7 +136,7 @@ window.addEventListener('load', function(e){
                                         
                                         let test2 = searchArray2(user.friendList, email, 'useremail');
                                         if(test2 == null){
-                                            fetch('http://127.0.0.1:8090/addFriend', {
+                                            fetch(serveUrl+'addFriend', {
                                                 method:'POST',
                                                 body:JSON.stringify({
                                                 email:email,

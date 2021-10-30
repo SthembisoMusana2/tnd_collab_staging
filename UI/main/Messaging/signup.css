@@ -7,6 +7,11 @@ body{
     background-position:center;
 }
 
+input{
+    height: 30px;
+    min-height: 1.8em;
+}
+
 .signup{
     display: none;
     transform: scale(0.9);

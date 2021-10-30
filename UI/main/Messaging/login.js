@@ -1,4 +1,16 @@
 
+let serverUrl = 'https://tnd-messaging.herokuapp.com/';
+
+async function hash(string) {
+    const utf8 = new TextEncoder().encode(string);
+    return crypto.subtle.digest('SHA-256', utf8).then((hashBuffer) => {
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray
+        .map((bytes) => bytes.toString(16).padStart(2, '0'))
+        .join('');
+      return hashHex;
+    });
+  }
 
 addEventListener('load', function(e){
     let login = document.getElementById('login');
@@ -10,6 +22,18 @@ addEventListener('load', function(e){
     const spinner = document.getElementsByClassName('spinner')[0];
     const spinner2 = document.getElementsByClassName('spinner')[1];
     const spinnerContainer = document.getElementsByClassName('spinner-cont')[0];
+    const confirmPassowrd = document.getElementById('cpassword');
+    let password1 = document.getElementById('pass');
+
+    confirmPassowrd.addEventListener('input', (e)=>{
+        console.log(password1.value)
+        if(e.target.value != password1.value){
+            confirmPassowrd.style.border = '1px solid red';
+        }
+        else{
+            confirmPassowrd.style.border = '1px solid green';
+        }
+    })
 
     loginLink.addEventListener('click', function(e){
         e.preventDefault();
@@ -31,97 +55,111 @@ addEventListener('load', function(e){
     loginForm.addEventListener('submit', function(e){
         e.preventDefault();
 
-        spinnerContainer.innerHTML = `<div class="spinner verticalCenter center">
-                                    </div>`
-        const spinner2 = document.getElementsByClassName('spinner')[1];
-        spinner2.style.visibility = 'visible';
-        
-
         const formData = new FormData(e.target);
         const email = formData.get('email');
-        const password = formData.get('password');
+        let password = formData.get('password');
 
-        let tempObj = {email:email, password:password};
+        hash(password).then(res=>{
+            password = res;
+            console.log(password);
 
-        fetch('http://127.0.0.1:8090/login', {
-            method:'POST',
-            body:JSON.stringify(tempObj)
-        }).then(resp=>{
-            resp.text()
-            .then(data=>{
-                spinner2.style.visibility = 'hidden';
-                resp = data.split('$')
-                console.log(resp)
-                if(resp[0] == 'successful'){
-                    //redirect to the user space...
-                    let userObj = JSON.parse(resp[1]);//JSON.parse(resp[1]);
-                    console.log(resp[1])
-                    localStorage.setItem('username', userObj.username);
-                    localStorage.setItem('email', userObj.email);
-                    localStorage.setItem('id', userObj.id);
-                    localStorage.setItem('password', tempObj.password);
+            spinnerContainer.innerHTML = `<div class="spinner verticalCenter center">
+                                    </div>`
+            const spinner2 = document.getElementsByClassName('spinner')[1];
+            spinner2.style.visibility = 'visible';
+            
+            let tempObj = {email:email, password:password};
 
-                    let path = window.location.pathname.split('/');
-                    path.pop();
-                    path.push('messaging.html');
-                    path = path.join('/');
-                    window.location.pathname = path; 
-                }
-                else{
-                    spinnerContainer.innerHTML = `<div class="verticalCenter center">
-                                                <p style="text-align:center;color:red;font-family:roboto;font-size:large; ">
-                                                    Login Failed ... please try again!
-                                                    </p>
-                                                </div>`
-                }
+            fetch(serverUrl+'login', {
+                method:'POST',
+                // mode:'no-cors',
+                body:JSON.stringify(tempObj)
+            }).then(resp=>{
+                resp.text()
+                .then(data=>{
+                    spinner2.style.visibility = 'hidden';
+                    resp = data.split('$')
+                    console.log(resp)
+                    if(resp[0] == 'successful'){
+                        //redirect to the user space...
+                        let userObj = JSON.parse(resp[1]);//JSON.parse(resp[1]);
+                        console.log(resp[1])
+                        localStorage.setItem('username', userObj.username);
+                        localStorage.setItem('email', userObj.email);
+                        localStorage.setItem('id', userObj.id);
+                        localStorage.setItem('password', tempObj.password);
+
+                        let path = window.location.pathname.split('/');
+                        path.pop();
+                        path.push('messaging.html');
+                        path = path.join('/');
+                        window.location.pathname = path; 
+                    }
+                    else{
+                        spinnerContainer.innerHTML = `<div class="verticalCenter center">
+                                                    <p style="text-align:center;color:red;font-family:roboto;font-size:large; ">
+                                                        Login Failed ... please try again!
+                                                        </p>
+                                                    </div>`
+                    }
+                });
             });
-        });
+        })
+        .catch(err=>{console.log('Error hashing the string -->', err.message)})
 
     });
 
     signUpForm.addEventListener('submit', function(e){
         e.preventDefault();
-        spinner.style.visibility = 'visible';
-
-
+        
         const formData = new FormData(e.target);
         const username = formData.get('username');
-        const password = formData.get('password');
-        const email = formData.get('email');
+        let password = formData.get('password');
+        const email = formData.get('email');  
+        let cpassword =  formData.get('cpassword');
+        
+        if(cpassword == password){
+            hash(password).then(res=>{
+                    password = res;
 
-        let tempObj = {username:username, email:email, password:password, avatar:localStorage.getItem('avatar')};
+                    spinner.style.visibility = 'visible';
 
-        fetch('http://127.0.0.1:8090/signup', {
-            method:'POST',
-            body:JSON.stringify(tempObj)
-        }).then(resp=>{
-            resp.text()
-            .then(data=>{
-                spinner.style.visibility = 'hidden';
-                resp = data.split('$');
-                if(resp[0] == 'Sign Up Successful'){
-                    //redirect to the user space...
-                    let userObj = JSON.parse(resp[1]);
-                    localStorage.setItem('username', userObj.username);
-                    localStorage.setItem('email', userObj.email);
-                    localStorage.setItem('id', userObj.id);
-                    localStorage.setItem('password', tempObj.password);
-                    
-                    let path = window.location.pathname.split('/');
-                    path.pop();
-                    path.push('messaging.html');
-                    path = path.join('/');
-                    window.location.pathname = path;
-                }
-                else{
-                    alert(resp[0]);
-                }
-            })
-            .catch(err=>{
+                    let tempObj = {username:username, email:email, password:password, avatar:localStorage.getItem('avatar')};
 
-            });
-        });
-        // send the data to Firebase and await response ...
+                    fetch(serverUrl+'signup', {
+                        method:'POST',
+                        // mode:'no-cors',
+                        body:JSON.stringify(tempObj)
+                    }).then(resp=>{
+                        resp.text()
+                        .then(data=>{
+                            spinner.style.visibility = 'hidden';
+                            resp = data.split('$');
+                            if(resp[0] == 'Sign Up Successful'){
+                                //redirect to the user space...
+                                let userObj = JSON.parse(resp[1]);
+                                localStorage.setItem('username', userObj.username);
+                                localStorage.setItem('email', userObj.email);
+                                localStorage.setItem('id', userObj.id);
+                                localStorage.setItem('password', tempObj.password);
+                                
+                                window.location.replace('messaging.html');
+                            }
+                            else{
+                            }
+                        })
+                        .catch(err=>{
+
+                        });
+                    });
+                })
+                .catch(err=>{
+                    console.log('Error Hashing the passowrd: ', err);
+                })
+            }
+            else{
+                alert("confirm passowrd doesn't match!");
+            }
     });
 
 

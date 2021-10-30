@@ -169,7 +169,7 @@ async function login(user={email:'', password:''}){
 
 // setting up the server
 let app = express();
-const PORT = 8090 || process.env.PORT;
+const PORT = process.env.PORT;
 const users = [];
 
 const url = "mongodb+srv://Sthembiso:Stheshboi2C@cluster0.2hrhj.mongodb.net/TND?retryWrites=true&w=majority";
@@ -186,6 +186,7 @@ app.use(express.text());
 app.use(express.urlencoded({extended:true}));
 
 app.post('/signin', (req, res)=>{ // register to the active users list
+    res.setHeader('Access-Control-Allow-Origin', '*');
     if(JSON.parse(req.body)!= null){
         let resBody = JSON.parse(req.body);
         if(searchArray(users, resBody.username) == null){ // add them to the active users list
@@ -198,6 +199,7 @@ app.post('/signin', (req, res)=>{ // register to the active users list
 });
 
 app.post('/users', (req, res)=>{ // request for your friend list
+    res.setHeader('Access-Control-Allow-Origin', '*');
     let user = JSON.parse(req.body);
     let userObj = searchArray(users, user.username);
     if(userObj!= null) res.end(JSON.stringify(userObj.friendListToJSON()));    
@@ -206,6 +208,7 @@ app.post('/users', (req, res)=>{ // request for your friend list
 
 app.post('/send', (req, res)=>{
     let messageRef = JSON.parse(req.body);
+    res.setHeader('Access-Control-Allow-Origin', '*');
     // route message from one user to the next
     if(messageRef.recipientType === 'single'){
         let recipient  = messageRef.recipient;
@@ -219,6 +222,7 @@ app.post('/send', (req, res)=>{
             user.updateMessageList(messageRef);
             messageRef.status = 'sent'
             res.end(JSON.stringify(messageRef));
+            console.log('sent Message', messageRef)
             return;
         }else{
             UserModel.findOne({email:recipient})
@@ -248,6 +252,7 @@ app.post('/send', (req, res)=>{
 });
 
 app.post('/poll', (req, res)=>{
+    res.setHeader('Access-Control-Allow-Origin', '*');
     let userRef = JSON.parse(req.body);
     let user = searchArray(users, userRef.username);
     if(user != null){
@@ -268,7 +273,7 @@ app.post('/addFriend', (req, res)=>{
     let user = JSON.parse(req.body);
     let userObj = searchArray(users, user.email, 'email');
     let owner = searchArray(users, user.owner, 'email');
-
+    res.setHeader('Access-Control-Allow-Origin', '*');
     if(userObj == null){
         UserModel.findOne({email:user.email})
             .then((dbRes)=>{
@@ -294,6 +299,7 @@ app.post('/addFriend', (req, res)=>{
 });
 
 app.post('/search', (req, res)=>{
+    res.setHeader('Access-Control-Allow-Origin', '*');
     let searchData = JSON.parse(req.body);
     let userObj = searchArray(users, searchData.name);
     if(userObj != null){
@@ -328,6 +334,7 @@ app.post('/search', (req, res)=>{
 });
 
 app.post('/signup', (req, res)=>{
+    res.setHeader('Access-Control-Allow-Origin', '*');
     let userFormData = JSON.parse(req.body);
     signUp(userFormData, res)
     .then(user=>{
@@ -358,7 +365,9 @@ app.post('/login', (req, resp)=>{
     let userFormData = JSON.parse(req.body);
     login(userFormData)
     .then(async res=>{
+        resp.setHeader('Access-Control-Allow-Origin', '*');
         if(res.status == ''){ // the login was successful
+            
             resp.write('successful$');
             let userSearch = searchArray(users, res.username);
             if(userSearch == null){
