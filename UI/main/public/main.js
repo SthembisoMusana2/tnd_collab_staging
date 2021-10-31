@@ -307,7 +307,8 @@ window.addEventListener('load', function(e){
             sendButton.addEventListener('click', function(e){
                 let messageBody = messageField.value;
                 if(messageBody.length > 0){
-                    let messageObject  = new Message(user.username,user.useremail, 'single', currentFriend.email, messageBody, Date(Date.now()), user.profileImage);
+                  
+                    let messageObject  = new Message(user.username,user.useremail, 'single', currentFriend.useremail, messageBody, Date(Date.now()), user.profileImage);
                     messageDisplayWind.innerHTML += messageObject.toHtml();
                     messageField.value = '';
                     currentFriend.messageList.push(messageObject);
@@ -324,7 +325,7 @@ window.addEventListener('load', function(e){
                 if(e.key == 'Enter'){
                     let messageBody = messageField.value;
                     if(messageBody.length > 0){
-                        let messageObject  = new Message(user.username,user.useremail, 'single', currentFriend.useremail, messageBody, Date(Date.now()), user.profileImage);
+                        let messageObject  = new Message(user.username, user.useremail, 'single', currentFriend.useremail, messageBody, Date(Date.now()), user.profileImage);
                         messageDisplayWind.innerHTML += messageObject.toHtml();
                         messageField.value = '';
                         currentFriend.messageList.push(messageObject);
