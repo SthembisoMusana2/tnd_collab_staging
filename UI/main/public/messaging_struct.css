@@ -1,4 +1,6 @@
-
+body{
+    max-width: 3360px;
+}
 .body{
     display:flex;
     width: 100%; 

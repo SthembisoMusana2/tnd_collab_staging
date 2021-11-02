@@ -67,26 +67,32 @@ window.addEventListener('load', function(e){
                                             let userName = userInfo[0];
                                             let email = userInfo[1];
                                             
-                                            let test2 = searchArray2(user.friendList, email, 'useremail');
-                                            if(test2 == null){
-                                                fetch(serverUrl+'addFriend', {
-                                                    method:'POST',
-                                                    body:JSON.stringify({
-                                                    email:email,
-                                                    owner:user.useremail
+                                            if(userName != user.username){
+                                                let email = userInfo[1];
+                                                
+                                                let test2 = searchArray2(user.friendList, email, 'useremail');
+                                                if(test2 == null){
+                                                    fetch(serveUrl+'addFriend', {
+                                                        method:'POST',
+                                                        body:JSON.stringify({
+                                                        email:email,
+                                                        owner:user.useremail
+                                                        })
                                                     })
-                                                })
-                                                .then((res)=>{
-                                                    user.appendFriend(new User(userName.trim(), email, email, friend.avatar, []));
-                                                    contactList.innerHTML = user.refreshFriendList();
-                                                    overlay.style.display = 'none';
-                                                    resultsContainer.innerHTML = '';
-                                                    updateUserClick();
-                                                })           
-                                            }
-                                            else{
-                                                alert('User already exist.');
-                                            }                 
+                                                    .then((res)=>{
+                                                        user.appendFriend(new User(userName.trim(), email, email, friend.avatar, []));
+                                                        contactList.innerHTML = user.refreshFriendList();
+                                                        overlay.style.display = 'none';
+                                                        resultsContainer.innerHTML = '';
+                                                        updateUserClick();
+                                                    })           
+                                                }
+                                                else{
+                                                    alert('User already exist.');
+                                                }                
+                                            }else{
+                                                alert("You can't add yourself.");
+                                            }                  
                                         });
                                     }
                                 }
@@ -132,28 +138,32 @@ window.addEventListener('load', function(e){
                                         let thisUser = usersList[i];
                                         let userInfo = thisUser.innerText.split('\n');
                                         let userName = userInfo[0];
-                                        let email = userInfo[1];
-                                        
-                                        let test2 = searchArray2(user.friendList, email, 'useremail');
-                                        if(test2 == null){
-                                            fetch(serveUrl+'addFriend', {
-                                                method:'POST',
-                                                body:JSON.stringify({
-                                                email:email,
-                                                owner:user.useremail
+                                        if(userName != user.username){
+                                            let email = userInfo[1];
+                                            
+                                            let test2 = searchArray2(user.friendList, email, 'useremail');
+                                            if(test2 == null){
+                                                fetch(serveUrl+'addFriend', {
+                                                    method:'POST',
+                                                    body:JSON.stringify({
+                                                    email:email,
+                                                    owner:user.useremail
+                                                    })
                                                 })
-                                            })
-                                            .then((res)=>{
-                                                user.appendFriend(new User(userName.trim(), email, email, friend.avatar, []));
-                                                contactList.innerHTML = user.refreshFriendList();
-                                                overlay.style.display = 'none';
-                                                resultsContainer.innerHTML = '';
-                                                updateUserClick();
-                                            })           
-                                        }
-                                        else{
-                                            alert('User already exist.');
-                                        }                 
+                                                .then((res)=>{
+                                                    user.appendFriend(new User(userName.trim(), email, email, friend.avatar, []));
+                                                    contactList.innerHTML = user.refreshFriendList();
+                                                    overlay.style.display = 'none';
+                                                    resultsContainer.innerHTML = '';
+                                                    updateUserClick();
+                                                })           
+                                            }
+                                            else{
+                                                alert('User already exist.');
+                                            }                
+                                        }else{
+                                            alert("You can't add yourself.");
+                                        } 
                                     });
                                 }
                             }

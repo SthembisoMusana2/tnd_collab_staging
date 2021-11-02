@@ -219,7 +219,9 @@ function createMessageObject(message={sender:'', sEmail:'', recipientType:'',
     messageTime:'',
     sent:0,
     group:''}, imgR){
-    return new Message(message.sender, message.sEmail, message.recipientType,message.recipient, message.messageBody, message.messageTime, imgR, 1, {});
+        if(message.sEmail == user.useremail)message.sent = 0;
+        else message.sent = 1;
+    return new Message(message.sender, message.sEmail, message.recipientType,message.recipient, message.messageBody, message.messageTime, imgR, message.sent, {});
 }
 
 const Users = [];
@@ -257,35 +259,45 @@ window.addEventListener('load', function(e){
        res.text()
        .then(data=>{
             let respData = data.split('$');
-            let userData = JSON.parse(respData[1]);
-            user = new User(userData.username, userData.email, userData.id, userData.avatar, []);
+            if(respData[0] != 'failed'){
+                let userData = JSON.parse(respData[1]);
+                console.log(userData);
+                user = new User(userData.username, userData.email, userData.id, userData.avatar, []);
 
-            userNameInfo.innerText =`${user.username}`;
-            userEmailInfo.innerHTML = `<p><a href='maitlto:'+${user.useremail} > ${user.useremail}</a></p>`
-            profileImage.setAttribute('src', user.profileImage);
-            profileView.setAttribute('src', user.profileImage);
+                userNameInfo.innerText =`${user.username}`;
+                userEmailInfo.innerHTML = `<p><a href='maitlto:'+${user.useremail} > ${user.useremail}</a></p>`
+                profileImage.setAttribute('src', user.profileImage);
+                profileView.setAttribute('src', user.profileImage);
 
-            let friends = userData['friends'];
-            if(friends.length > 0){
-               for(let i=0; i<friends.length; i++){
-                    let temp = friends['friend '+i];
-                    let tempUser = new User(temp.username, temp.email, temp.email, temp.avatar, []);
-                    user.appendFriend(tempUser);
-               }
-               user.friendList.sort((user1, user2)=>{
-                    if(user1.email>user2.email)return 1;
-                    else if(user1.email<user2.email)return -1;
-                    return 0
-                });
+                let friends = userData['friends'];
+                if(friends.length > 0){
+                    for(let i=0; i<friends.length; i++){
+                            let temp = friends['friend '+i];
+                            let tempUser = new User(temp.username, temp.email, temp.email, temp.avatar, []);
+                            for(let message of userData.messages[temp.email]){ // grab individual friend history
+                                tempUser.messageList.push(createMessageObject(message, temp.avatar));
+                            }
+                            user.appendFriend(tempUser);
+                    }
+                    user.friendList.sort((user1, user2)=>{
+                            if(user1.email>user2.email)return 1;
+                            else if(user1.email<user2.email)return -1;
+                            return 0
+                        });
 
-            for(let i =0; i<user.friendList.length; i++) {
-                contactList.innerHTML += user.friendList[i].toHtml();
-            } 
-            updateUserClick();
-           }
-       })
+                    for(let i =0; i<user.friendList.length; i++) {
+                        contactList.innerHTML += user.friendList[i].toHtml();
+                    } 
+                    updateUserClick();
+                }
+            }
+            else{
+                window.location.replace('signup.html')
+            }
+        })
     }).catch(err=>{
         loginSuccess = false;
+        console.log('There was an error')
     });
     
     loginSuccess = sessionStorage.getItem('loginStatus');
@@ -307,7 +319,6 @@ window.addEventListener('load', function(e){
             sendButton.addEventListener('click', function(e){
                 let messageBody = messageField.value;
                 if(messageBody.length > 0){
-                  
                     let messageObject  = new Message(user.username,user.useremail, 'single', currentFriend.useremail, messageBody, Date(Date.now()), user.profileImage);
                     messageDisplayWind.innerHTML += messageObject.toHtml();
                     messageField.value = '';
@@ -325,7 +336,7 @@ window.addEventListener('load', function(e){
                 if(e.key == 'Enter'){
                     let messageBody = messageField.value;
                     if(messageBody.length > 0){
-                        let messageObject  = new Message(user.username, user.useremail, 'single', currentFriend.useremail, messageBody, Date(Date.now()), user.profileImage);
+                        let messageObject  = new Message(user.username,user.useremail, 'single', currentFriend.useremail, messageBody, Date(Date.now()), user.profileImage);
                         messageDisplayWind.innerHTML += messageObject.toHtml();
                         messageField.value = '';
                         currentFriend.messageList.push(messageObject);
